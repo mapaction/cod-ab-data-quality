@@ -58,32 +58,3 @@ poetry run pre-commit install
 ```bash
 poetry add [package-name]
 ```
-
-### Lint and format
-
-All code is formatted according to [black](https://black.readthedocs.io/en/stable/), [flake8](https://flake8.pycqa.org/en/latest/), and [PyMarkdown](https://github.com/jackdewinter/pymarkdown) guidelines.  
-The repo is set-up to trigger lint tests automatically on each commit using [pre-commit](https://pre-commit.com/).
-
-You can also run lint tests manually using
-
-```bash
-make lint
-```
-
-or if you do not have `make` on your OS (i.e. Windows), you can run
-
-```bash
-poetry run pre-commit run --all-files
-```
-
-This is especially useful if you try to resolve some failed test.  
-Once you passed all tests, you should see something like this
-
-```bash
-$ make lint
-Running lint tests..
-black....................................................................Passed
-isort....................................................................Passed
-flake8...................................................................Passed
-pymarkdown...............................................................Passed
-```
