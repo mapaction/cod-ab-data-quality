@@ -1,10 +1,11 @@
-## Development
+# Development
 
-We use **[Poetry](https://python-poetry.org/)** for package management. Poetry is production tested dependency management tool with exact version locking and support for packaging and virtual environments.
+We use **[Poetry](https://python-poetry.org/)** for package management.
+Poetry is production tested dependency management
+tool with exact version locking and support
+for packaging and virtual environments.
 
-### Installing Poetry
-
-:book: [Install Poetry on Linux, macOS, Windows (WSL)](https://python-poetry.org/docs/#installing-with-the-official-installer) using the official installer
+## Installing Poetry
 
 ```bash
 curl -sSL https://install.python-poetry.org | python3 -
