@@ -11,7 +11,7 @@ for packaging and virtual environments.
 curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-if necessary, add poetry location to `PATH`
+If necessary, add poetry location to `PATH`
 
 ```bash
 echo 'export POETRY_HOME="$HOME/.local/bin"' >> ~/.bashrc
