@@ -11,7 +11,7 @@ for packaging and virtual environments.
 curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-if necessary, add poetry location to `PATH`
+If necessary, add poetry location to `PATH`
 
 ```bash
 echo 'export POETRY_HOME="$HOME/.local/bin"' >> ~/.bashrc
@@ -32,7 +32,7 @@ poetry --version
 Before you start developing in this repository,  
 you will need to install project dependencies and pre-commit Git hooks.
 
-navigate to the project directory
+Navigate to the project directory:
 
 ```bash
 cd cod-ab-data-quality
