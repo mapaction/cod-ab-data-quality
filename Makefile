@@ -9,7 +9,7 @@ all = help
 hooks:
 	@echo "Adding pre-commit hooks.."
 	@poetry run pre-commit install
-	
+
 
 test:
 	@echo "Running unit tests.."

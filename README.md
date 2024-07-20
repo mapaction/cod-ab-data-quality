@@ -29,7 +29,7 @@ poetry --version
 
 ### Installing dependencies
 
-Before you start developing in this repository,  
+Before you start developing in this repository,
 you will need to install project dependencies and pre-commit Git hooks.
 
 Navigate to the project directory:
