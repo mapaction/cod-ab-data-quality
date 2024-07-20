@@ -32,7 +32,7 @@ poetry --version
 Before you start developing in this repository,  
 you will need to install project dependencies and pre-commit Git hooks.
 
-navigate to the project directory
+Navigate to the project directory:
 
 ```bash
 cd cod-ab-data-quality
