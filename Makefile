@@ -24,6 +24,13 @@ clean:
 	@rm -rf .venv
 	@poetry env remove --all
 
+metadata:
+	@echo "Generating metadata"
+	@poetry run python -m src.metadata
+
+run:
+	@echo "Running all commands"
+	@make metadata
 
 help:
 	@echo "Available make targets:"
@@ -33,3 +40,5 @@ help:
 	@echo " make test           - Run unit tests"
 	@echo " make lint           - Run lint tests"
 	@echo " make clean          - Remove .venv"
+	@echo " make metadata       - Generate metadata"
+	@echo " make run       		- Run all commands"

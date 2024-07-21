@@ -9,14 +9,15 @@ repos:
         types: [file, python]
       - id: isort
         name: isort
-        entry: poetry run isort
+        entry: poetry run isort --profile black
         language: system
         types: [file, python]
-      - id: flake8
-        name: flake8
-        entry: poetry run flake8
+      - id: ruff
+        name: ruff
+        entry: poetry run ruff check
         language: system
         types: [file, python]
+        args: [--no-cache]
       - id: pymarkdown
         name: pymarkdown
         entry: poetry run pymarkdown scan

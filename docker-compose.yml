@@ -1,0 +1,5 @@
+services:
+  cod-ab-data-quality:
+    build: .
+    volumes:
+      - ./data:/usr/src/app/data

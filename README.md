@@ -27,6 +27,11 @@ test that installation was successful
 poetry --version
 ```
 
+### Installing GDAL
+
+GDAL must be installed for some python dependancies to work.
+Follow the instructions for your operating system: <https://gdal.org/download.html>
+
 ### Installing dependencies
 
 Before you start developing in this repository,
