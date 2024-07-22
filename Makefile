@@ -28,9 +28,14 @@ metadata:
 	@echo "Generating metadata"
 	@poetry run python -m src.metadata
 
+download:
+	@echo "Downloading boundaries"
+	@poetry run python -m src.download
+
 run:
 	@echo "Running all commands"
 	@make metadata
+	@make download
 
 help:
 	@echo "Available make targets:"
@@ -41,4 +46,5 @@ help:
 	@echo " make lint           - Run lint tests"
 	@echo " make clean          - Remove .venv"
 	@echo " make metadata       - Generate metadata"
+	@echo " make metadata       - Download boundaries"
 	@echo " make run       		- Run all commands"

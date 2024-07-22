@@ -13,18 +13,22 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 cwd = Path(__file__).parent
 
 columns = [
-    "iso_3",
+    "iso3",
+    "iso2",
     "name",
-    "admin_level",
-    "admin_level_partial",
-    "language_1",
-    "language_2",
-    "language_3",
     "itos_url",
+    "itos_service",
     "itos_date",
     "itos_update",
-    "itos_error",
-    "itos_index",
+    "itos_language_1",
+    "itos_language_2",
+    "itos_language_3",
+    "itos_level",
+    "itos_index_0",
+    "itos_index_1",
+    "itos_index_2",
+    "itos_index_3",
+    "itos_index_4",
     "hdx_url",
     "hdx_date",
     "hdx_update",
@@ -46,12 +50,19 @@ def join_hdx_metadata(row, hdx):
     row["hdx_source_1"] = hdx["dataset_source"]
     row["hdx_source_2"] = hdx["organization"]["title"]
     row["hdx_license"] = hdx["license_title"]
-    row["hdx_url"] = f"https://data.humdata.org/dataset/cod-ab-{row['iso_3'].lower()}"
+    row["hdx_url"] = f"https://data.humdata.org/dataset/cod-ab-{row['iso3'].lower()}"
     return row
 
 
 def join_itos_metadata(row, itos):
     row["itos_url"] = itos["url"]
+    row["itos_service"] = itos["path"]
     row["itos_date"] = itos["date"]
     row["itos_update"] = itos["update"]
+    for n in range(3):
+        lang = itos["langs"][n] if n < len(itos["langs"]) else None
+        row[f"itos_language_{n+1}"] = lang
+    row["itos_level"] = list(itos["layers"].keys())[-1]
+    for n in range(5):
+        row[f"itos_index_{n}"] = itos["layers"].get(n)
     return row
