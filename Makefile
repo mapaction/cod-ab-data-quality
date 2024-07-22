@@ -46,5 +46,5 @@ help:
 	@echo " make lint           - Run lint tests"
 	@echo " make clean          - Remove .venv"
 	@echo " make metadata       - Generate metadata"
-	@echo " make metadata       - Download boundaries"
+	@echo " make download       - Download boundaries"
 	@echo " make run       		- Run all commands"
