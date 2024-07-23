@@ -19,7 +19,7 @@ outputs = cwd / "../../data/itos"
 def is_polygon(file):
     regex = re.compile(r"\((Multi Polygon|Polygon)\)")
     result = subprocess.run(["ogrinfo", file], capture_output=True)
-    return regex.search(str(result.stdout))
+    return regex.search(result.stdout.decode("utf-8"))
 
 
 def get_metadata():
