@@ -1,24 +1,35 @@
-import logging
-import re
-import subprocess
+from logging import INFO, WARNING, basicConfig, getLogger
+from os import getenv
 from pathlib import Path
+from re import compile
+from subprocess import run
 
 import pandas as pd
+from dotenv import load_dotenv
 
-logging.basicConfig(
-    level=logging.INFO,
+load_dotenv(override=True)
+basicConfig(
+    level=INFO,
     format="%(asctime)s - %(name)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
-logging.getLogger("httpx").setLevel(logging.WARNING)
+getLogger("httpx").setLevel(WARNING)
 
 cwd = Path(__file__).parent
 outputs = cwd / "../../data/itos"
 
 
+def strip_list(items: list):
+    return [item.strip().upper() for item in items if item.strip() != ""]
+
+
+def get_iso3():
+    return strip_list(getenv("ISO3", "").split(","))
+
+
 def is_polygon(file):
-    regex = re.compile(r"\((Multi Polygon|Polygon)\)")
-    result = subprocess.run(["ogrinfo", file], capture_output=True)
+    regex = compile(r"\((Multi Polygon|Polygon)\)")
+    result = run(["ogrinfo", file], capture_output=True)
     return regex.search(result.stdout.decode("utf-8"))
 
 
@@ -33,6 +44,9 @@ def get_metadata():
     }
     df = pd.read_csv(cwd / "../../data/metadata.csv", dtype=dtypes)
     records = df.to_dict("records")
+    iso3_list = get_iso3()
+    if len(iso3_list):
+        records = [x for x in records if x["iso3"] in iso3_list]
     result = []
     for record in records:
         for level in range(5):

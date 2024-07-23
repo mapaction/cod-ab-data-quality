@@ -10,6 +10,7 @@ version = "0.1.0"
 httpx = { version = "^0.27.0", extras = ["http2"] }
 pandas = "^2.2.2"
 python = "^3.12"
+python-dotenv = "^1.0.1"
 tenacity = "^8.5.0"
 tqdm = "^4.66.4"
 
