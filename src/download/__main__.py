@@ -1,9 +1,11 @@
 from logging import getLogger
 from subprocess import DEVNULL, run
+from time import sleep
 
+from tenacity import retry, stop_after_attempt, wait_fixed
 from tqdm import tqdm
 
-from .utils import get_metadata, is_polygon, outputs
+from .utils import ATTEMPT, WAIT, get_metadata, is_polygon, outputs
 
 logger = getLogger(__name__)
 
@@ -25,6 +27,7 @@ def ogr2ogr(idx: int, url: str, filename: str, records: int | None):
     )
 
 
+@retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
 def download(iso3: str, lvl: int, idx: int, url: str):
     filename = f"{iso3}_adm{lvl}".lower()
     success = False
@@ -33,12 +36,14 @@ def download(iso3: str, lvl: int, idx: int, url: str):
         if result.returncode == 0:
             success = True
             break
+        else:
+            sleep(WAIT)
     if success:
         if not is_polygon(outputs / f"{filename}.gpkg"):
             (outputs / f"{filename}.gpkg").unlink()
             logger.info(f"NOT POLYGON: {filename}")
     else:
-        logger.info(f"NOT DOWNLOADED: {filename}")
+        raise Exception
 
 
 if __name__ == "__main__":

@@ -15,6 +15,9 @@ basicConfig(
 )
 getLogger("httpx").setLevel(WARNING)
 
+ATTEMPT = 5
+WAIT = 10
+
 cwd = Path(__file__).parent
 outputs = cwd / "../../data/itos"
 
