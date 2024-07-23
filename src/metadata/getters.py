@@ -1,15 +1,17 @@
-import re
 from datetime import date
+from re import compile
 
-import httpx
+from httpx import Client
 from tenacity import retry, stop_after_attempt
 
+from .utils import ATTEMPT, TIMEOUT
 
-@retry(stop=stop_after_attempt(5))
+
+@retry(stop=stop_after_attempt(ATTEMPT))
 def get_hdx_metadata(iso3: str):
     id = f"cod-ab-{iso3.lower()}"
     url = f"https://data.humdata.org/api/3/action/package_show?id={id}"
-    with httpx.Client(http2=True, timeout=60) as client:
+    with Client(http2=True, timeout=TIMEOUT) as client:
         return client.get(url).json().get("result")
 
 
@@ -18,38 +20,39 @@ def get_service_url(path: str, iso3: str):
     return f"{base}/{path}/{iso3}_pcode/FeatureServer?f=json"
 
 
-def get_layer_url(path: str, iso_3: str, idx: int):
+def get_layer_url(path: str, iso3: str, idx: int):
     base = "https://codgis.itos.uga.edu/arcgis/rest/services"
     query = "where=1=1&outFields=*&f=json&resultRecordCount=1&returnGeometry=false"
-    return f"{base}/{path}/{iso_3}_pcode/FeatureServer/{idx}/query?{query}"
+    return f"{base}/{path}/{iso3}_pcode/FeatureServer/{idx}/query?{query}"
 
 
-def get_layer(service: dict, path: str, iso3: str, client: httpx.Client):
-    p = re.compile(r"Admin")
-    layers = list(filter(lambda x: p.search(x["name"]), service["layers"]))
-    layers = list(filter(lambda x: x["geometryType"] == "esriGeometryPolygon", layers))
-    layer_map = {}
+@retry(stop=stop_after_attempt(ATTEMPT))
+def get_layer(service: dict, path: str, iso3: str):
+    p = compile(r"Admin")
+    layers = [x for x in service["layers"] if p.search(x["name"])]
+    layers = [x for x in layers if x["geometryType"] == "esriGeometryPolygon"]
+    indexes = {}
     idx = 0
     for layer in layers:
         lvl = int(layer["name"][-1])
         idx = layer["id"]
-        layer_map[lvl] = idx
-    url = get_layer_url(path, iso3, idx)
-    return layer_map, lvl, client.get(url).json()
+        indexes[lvl] = idx
+    with Client(http2=True, timeout=TIMEOUT) as client:
+        url = get_layer_url(path, iso3, idx)
+        return client.get(url).json(), indexes, lvl
 
 
-def get_languages(attrbutes: dict, lvl: int):
-    keys = list(attrbutes.keys())
-    p = re.compile(rf"^ADM{lvl}_\w{{2}}$")
-    langs = list(filter(lambda x: p.search(x), keys))
-    langs = list(map(lambda x: x.split("_")[1].lower(), langs))
+def get_languages(attrs: dict, lvl: int):
+    keys = list(attrs.keys())
+    p = compile(rf"^ADM{lvl}_\w{{2}}$")
+    langs = [x.split("_")[1].lower() for x in keys if p.search(x)]
     langs = list(dict.fromkeys(langs))
     return langs
 
 
-@retry(stop=stop_after_attempt(5))
+@retry(stop=stop_after_attempt(ATTEMPT))
 def get_itos_metadata(iso3: str):
-    with httpx.Client(http2=True, timeout=60) as client:
+    with Client(http2=True, timeout=TIMEOUT) as client:
         path = "COD_External"
         url = get_service_url(path, iso3)
         service = client.get(url).json()
@@ -59,11 +62,11 @@ def get_itos_metadata(iso3: str):
             service = client.get(url).json()
             if "error" in service:
                 return None
-        layers, lvl, layer = get_layer(service, path, iso3, client)
+    layer, indexes, lvl = get_layer(service, path, iso3)
     attrs = layer["features"][0]["attributes"]
     langs = get_languages(attrs, lvl)
     itos_url = url.split("?")[0]
-    result = {"url": itos_url, "path": path, "langs": langs, "layers": layers}
+    result = {"url": itos_url, "path": path, "langs": langs, "indexes": indexes}
     if attrs.get("date") is None:
         result["date"] = None
         result["update"] = None

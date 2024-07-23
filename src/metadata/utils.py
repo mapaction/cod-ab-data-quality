@@ -1,14 +1,17 @@
-import logging
+from logging import INFO, WARNING, basicConfig, getLogger
 from pathlib import Path
 
-import pandas as pd
+from pandas import read_csv
 
-logging.basicConfig(
-    level=logging.INFO,
+basicConfig(
+    level=INFO,
     format="%(asctime)s - %(name)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
-logging.getLogger("httpx").setLevel(logging.WARNING)
+getLogger("httpx").setLevel(WARNING)
+
+ATTEMPT = 10
+TIMEOUT = 10
 
 cwd = Path(__file__).parent
 
@@ -40,7 +43,7 @@ columns = [
 
 def get_config():
     dtypes = {"admin_level": "Int8", "itos_index": "Int8", "itos_error": str}
-    df = pd.read_csv(cwd / "../config.csv", dtype=dtypes)
+    df = read_csv(cwd / "../config.csv", dtype=dtypes)
     return df.to_dict("records")
 
 
@@ -62,7 +65,7 @@ def join_itos_metadata(row, itos):
     for n in range(3):
         lang = itos["langs"][n] if n < len(itos["langs"]) else None
         row[f"itos_language_{n+1}"] = lang
-    row["itos_level"] = list(itos["layers"].keys())[-1]
+    row["itos_level"] = list(itos["indexes"].keys())[-1]
     for n in range(5):
-        row[f"itos_index_{n}"] = itos["layers"].get(n)
+        row[f"itos_index_{n}"] = itos["indexes"].get(n)
     return row

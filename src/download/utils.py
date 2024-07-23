@@ -4,8 +4,8 @@ from pathlib import Path
 from re import compile
 from subprocess import run
 
-import pandas as pd
 from dotenv import load_dotenv
+from pandas import read_csv
 
 load_dotenv(override=True)
 basicConfig(
@@ -19,12 +19,12 @@ cwd = Path(__file__).parent
 outputs = cwd / "../../data/itos"
 
 
-def strip_list(items: list):
+def clean_list(items: list):
     return [item.strip().upper() for item in items if item.strip() != ""]
 
 
 def get_iso3():
-    return strip_list(getenv("ISO3", "").split(","))
+    return clean_list(getenv("ISO3", "").split(","))
 
 
 def is_polygon(file):
@@ -42,7 +42,7 @@ def get_metadata():
         "itos_index_3": "Int8",
         "itos_index_4": "Int8",
     }
-    df = pd.read_csv(cwd / "../../data/metadata.csv", dtype=dtypes)
+    df = read_csv(cwd / "../../data/metadata.csv", dtype=dtypes)
     records = df.to_dict("records")
     iso3_list = get_iso3()
     if len(iso3_list):

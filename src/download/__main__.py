@@ -1,16 +1,16 @@
-import logging
-import subprocess
+from logging import getLogger
+from subprocess import DEVNULL, run
 
 from tqdm import tqdm
 
 from .utils import get_metadata, is_polygon, outputs
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
-def run(idx: int, url: str, filename: str, records: int | None):
+def ogr2ogr(idx: int, url: str, filename: str, records: int | None):
     record_count = f"&resultRecordCount={records}" if records is not None else ""
-    return subprocess.run(
+    return run(
         [
             "ogr2ogr",
             "-overwrite",
@@ -21,7 +21,7 @@ def run(idx: int, url: str, filename: str, records: int | None):
             outputs / f"{filename}.gpkg",
             f"{url}/{idx}/query?where=1=1&outFields=*&f=json{record_count}",
         ],
-        stderr=subprocess.DEVNULL,
+        stderr=DEVNULL,
     )
 
 
@@ -29,7 +29,7 @@ def download(iso3: str, lvl: int, idx: int, url: str):
     filename = f"{iso3}_adm{lvl}".lower()
     success = False
     for records in [None, 1000, 100, 10, 1]:
-        result = run(idx, url, filename, records)
+        result = ogr2ogr(idx, url, filename, records)
         if result.returncode == 0:
             success = True
             break
