@@ -10,8 +10,9 @@ basicConfig(
 )
 getLogger("httpx").setLevel(WARNING)
 
-ATTEMPT = 10
-TIMEOUT = 10
+ATTEMPT = 5
+WAIT = 10
+TIMEOUT = 20
 
 cwd = Path(__file__).parent
 

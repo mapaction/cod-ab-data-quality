@@ -2,12 +2,12 @@ from datetime import date
 from re import compile
 
 from httpx import Client
-from tenacity import retry, stop_after_attempt
+from tenacity import retry, stop_after_attempt, wait_fixed
 
-from .utils import ATTEMPT, TIMEOUT
+from .utils import ATTEMPT, TIMEOUT, WAIT
 
 
-@retry(stop=stop_after_attempt(ATTEMPT))
+@retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
 def get_hdx_metadata(iso3: str):
     id = f"cod-ab-{iso3.lower()}"
     url = f"https://data.humdata.org/api/3/action/package_show?id={id}"
@@ -26,7 +26,22 @@ def get_layer_url(path: str, iso3: str, idx: int):
     return f"{base}/{path}/{iso3}_pcode/FeatureServer/{idx}/query?{query}"
 
 
-@retry(stop=stop_after_attempt(ATTEMPT))
+@retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
+def get_service(iso3: str):
+    with Client(http2=True, timeout=TIMEOUT) as client:
+        path = "COD_External"
+        url = get_service_url(path, iso3)
+        service = client.get(url).json()
+        if "error" in service:
+            path = "COD_NO_GEOM_CHECK"
+            url = get_service_url(path, iso3)
+            service = client.get(url).json()
+            if "error" in service:
+                service = None
+    return service, path, url.split("?")[0]
+
+
+@retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
 def get_layer(service: dict, path: str, iso3: str):
     p = compile(r"Admin")
     layers = [x for x in service["layers"] if p.search(x["name"])]
@@ -39,7 +54,9 @@ def get_layer(service: dict, path: str, iso3: str):
         indexes[lvl] = idx
     with Client(http2=True, timeout=TIMEOUT) as client:
         url = get_layer_url(path, iso3, idx)
-        return client.get(url).json(), indexes, lvl
+        r = client.get(url).json()
+    attrs = r["features"][0]["attributes"]
+    return attrs, indexes, lvl
 
 
 def get_languages(attrs: dict, lvl: int):
@@ -50,23 +67,13 @@ def get_languages(attrs: dict, lvl: int):
     return langs
 
 
-@retry(stop=stop_after_attempt(ATTEMPT))
 def get_itos_metadata(iso3: str):
-    with Client(http2=True, timeout=TIMEOUT) as client:
-        path = "COD_External"
-        url = get_service_url(path, iso3)
-        service = client.get(url).json()
-        if "error" in service:
-            path = "COD_NO_GEOM_CHECK"
-            url = get_service_url(path, iso3)
-            service = client.get(url).json()
-            if "error" in service:
-                return None
-    layer, indexes, lvl = get_layer(service, path, iso3)
-    attrs = layer["features"][0]["attributes"]
+    service, path, url = get_service(iso3)
+    if service is None:
+        return None
+    attrs, indexes, lvl = get_layer(service, path, iso3)
     langs = get_languages(attrs, lvl)
-    itos_url = url.split("?")[0]
-    result = {"url": itos_url, "path": path, "langs": langs, "indexes": indexes}
+    result = {"url": url, "path": path, "langs": langs, "indexes": indexes}
     if attrs.get("date") is None:
         result["date"] = None
         result["update"] = None
