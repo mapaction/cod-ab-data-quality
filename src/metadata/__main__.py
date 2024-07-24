@@ -31,7 +31,7 @@ def get_metadata():
 
 def save_metadata(metadata):
     df = DataFrame(metadata)
-    df = df[df["hdx_date"].notna()]
+    df = df[df["hdx_url"].notna() | df["itos_url"].notna()]
     df = df[columns]
     dest = cwd / "../../data/metadata.csv"
     df.to_csv(dest, encoding="utf-8-sig", float_format="%.0f", index=False)
