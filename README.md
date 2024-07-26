@@ -29,8 +29,9 @@ poetry --version
 
 ### Installing GDAL
 
-GDAL must be installed for some python dependancies to work.
+GDAL is an optional dependancy which enables file downloading through `ogr2ogr`.
 Follow the instructions for your operating system: <https://gdal.org/download.html>
+If not installed, `httpx` and `geopandas` with `pyarrow` will be used.
 
 ### Installing dependencies
 

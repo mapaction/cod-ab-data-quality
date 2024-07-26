@@ -1,18 +1,13 @@
 from datetime import date
 from re import compile
 
-from httpx import Client
-from tenacity import retry, stop_after_attempt, wait_fixed
-
-from .utils import ATTEMPT, TIMEOUT, WAIT
+from .utils import client_get
 
 
-@retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
 def get_hdx_metadata(iso3: str):
     id = f"cod-ab-{iso3.lower()}"
     url = f"https://data.humdata.org/api/3/action/package_show?id={id}"
-    with Client(http2=True, timeout=TIMEOUT) as client:
-        return client.get(url).json().get("result")
+    return client_get(url).json().get("result")
 
 
 def get_service_url(path: str, iso3: str):
@@ -22,26 +17,23 @@ def get_service_url(path: str, iso3: str):
 
 def get_layer_url(path: str, iso3: str, idx: int):
     base = "https://codgis.itos.uga.edu/arcgis/rest/services"
-    query = "where=1=1&outFields=*&f=json&resultRecordCount=1&returnGeometry=false"
+    query = "f=json&where=1=1&outFields=*&resultRecordCount=1&returnGeometry=false"
     return f"{base}/{path}/{iso3}_pcode/FeatureServer/{idx}/query?{query}"
 
 
-@retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
 def get_service(iso3: str):
-    with Client(http2=True, timeout=TIMEOUT) as client:
-        path = "COD_External"
+    path = "COD_External"
+    url = get_service_url(path, iso3)
+    service = client_get(url).json()
+    if "error" in service:
+        path = "COD_NO_GEOM_CHECK"
         url = get_service_url(path, iso3)
-        service = client.get(url).json()
+        service = client_get(url).json()
         if "error" in service:
-            path = "COD_NO_GEOM_CHECK"
-            url = get_service_url(path, iso3)
-            service = client.get(url).json()
-            if "error" in service:
-                service = None
+            service = None
     return service, path, url.split("?")[0]
 
 
-@retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
 def get_layer(service: dict, path: str, iso3: str):
     p = compile(r"Admin")
     layers = [x for x in service["layers"] if p.search(x["name"])]
@@ -52,9 +44,8 @@ def get_layer(service: dict, path: str, iso3: str):
         lvl = int(layer["name"][-1])
         idx = layer["id"]
         indexes[lvl] = idx
-    with Client(http2=True, timeout=TIMEOUT) as client:
-        url = get_layer_url(path, iso3, idx)
-        r = client.get(url).json()
+    url = get_layer_url(path, iso3, idx)
+    r = client_get(url).json()
     attrs = r["features"][0]["attributes"]
     return attrs, indexes, lvl
 

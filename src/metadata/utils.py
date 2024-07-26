@@ -1,7 +1,9 @@
 from logging import INFO, WARNING, basicConfig, getLogger
 from pathlib import Path
 
+from httpx import Client
 from pandas import read_csv
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 basicConfig(
     level=INFO,
@@ -40,6 +42,12 @@ columns = [
     "hdx_source_2",
     "hdx_license",
 ]
+
+
+@retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
+def client_get(url: str):
+    with Client(http2=True, timeout=TIMEOUT) as client:
+        return client.get(url)
 
 
 def get_config():

@@ -1,19 +1,17 @@
 from logging import getLogger
 
-from httpx import Client
 from pandas import DataFrame
 from tqdm import tqdm
 
 from .getters import get_hdx_metadata, get_itos_metadata
-from .utils import columns, cwd, join_hdx_metadata, join_itos_metadata
+from .utils import client_get, columns, cwd, join_hdx_metadata, join_itos_metadata
 
 logger = getLogger(__name__)
 
 
 def get_metadata():
     url = "https://vocabulary.unocha.org/json/beta-v4/countries.json"
-    with Client(http2=True, timeout=60) as client:
-        metadata = client.get(url).json()["data"]
+    metadata = client_get(url).json()["data"]
     metadata = [x for x in metadata if x["iso3"] is not None]
     metadata.sort(key=lambda x: x["iso3"])
     pbar = tqdm(metadata)

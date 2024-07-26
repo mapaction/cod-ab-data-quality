@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    gdal-bin make python3-poetry python3-venv \
+    gdal-bin make python3-poetry \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
