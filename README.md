@@ -64,3 +64,16 @@ poetry run pre-commit install
 ```bash
 poetry add [package-name]
 ```
+
+### Running commands
+
+Most commands can be accessed through `make`.
+In particular, `make run` will run all commands of this project in sequence.
+
+Alternatively, `make run` can be run through the [Docker] command:
+
+```bash
+docker compose up --build
+```
+
+[Docker]: https://www.docker.com/products/docker-desktop/
