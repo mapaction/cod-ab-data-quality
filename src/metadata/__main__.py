@@ -34,6 +34,7 @@ def save_metadata(metadata):
     df = df[df["hdx_url"].notna() | df["itos_url"].notna()]
     df = df[columns]
     dest = cwd / "../../data/metadata.csv"
+    dest.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(dest, encoding="utf-8-sig", float_format="%.0f", index=False)
 
 
