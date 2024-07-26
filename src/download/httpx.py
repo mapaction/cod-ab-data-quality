@@ -3,6 +3,7 @@ from logging import getLogger
 from time import sleep
 
 from geopandas import read_file
+from pandas import to_datetime
 
 from .utils import WAIT, client_get, outputs
 
@@ -23,6 +24,8 @@ def get_query_count(url: str, idx: int):
 def save_file(text: str, filename: str):
     gdf = read_file(text, use_arrow=True)
     gdf = gdf.drop(columns=["OBJECTID"], errors="ignore")
+    for col in gdf.select_dtypes(include=["datetime"]):
+        gdf[col] = to_datetime(gdf[col], utc=True)
     gdf.to_file(outputs / f"{filename}.gpkg")
 
 
