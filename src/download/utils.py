@@ -16,6 +16,7 @@ basicConfig(
 getLogger("httpx").setLevel(WARNING)
 getLogger("pyogrio._io").setLevel(WARNING)
 
+environ["OGR_GEOJSON_MAX_OBJ_SIZE"] = "0"
 environ["OGR_ORGANIZE_POLYGONS"] = "ONLY_CCW"
 
 ATTEMPT = 5

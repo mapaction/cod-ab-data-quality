@@ -17,7 +17,6 @@ def ogr2ogr(idx: int, url: str, filename: str, records: int | None):
         [
             "ogr2ogr",
             "-overwrite",
-            *["--config", "OGR_GEOJSON_MAX_OBJ_SIZE", "0"],
             *["-nln", filename],
             *["-oo", "FEATURE_SERVER_PAGING=YES"],
             outputs / f"{filename}.gpkg",
