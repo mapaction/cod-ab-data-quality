@@ -1,4 +1,4 @@
-from json import dumps
+from json import dump
 from logging import getLogger
 
 from geopandas import read_file
@@ -21,11 +21,15 @@ def get_query_count(url: str, idx: int):
 
 
 def save_file(data: dict, filename: str):
-    gdf = read_file(dumps(data), use_arrow=True)
+    tmp = outputs / f"{filename}.json"
+    with open(tmp, "w") as f:
+        dump(data, f, separators=(",", ":"))
+    gdf = read_file(tmp, use_arrow=True)
     gdf = gdf.drop(columns=["OBJECTID"], errors="ignore")
     for col in gdf.select_dtypes(include=["datetime"]):
         gdf[col] = to_datetime(gdf[col], utc=True)
     gdf.to_file(outputs / f"{filename}.gpkg")
+    tmp.unlink(missing_ok=True)
 
 
 def download(iso3: str, lvl: int, idx: int, url: str):
