@@ -29,9 +29,9 @@ poetry --version
 
 ### Installing GDAL
 
-GDAL is an optional dependancy which enables file downloading through `ogr2ogr`.
-Follow the instructions for your operating system: <https://gdal.org/download.html>
-If not installed, `httpx` and `geopandas` with `pyarrow` will be used.
+[GDAL](https://gdal.org/download.html) is an optional dependancy which enables file
+downloading through `ogr2ogr`. If not installed,
+`httpx` and `geopandas` with `pyarrow` will be used to download files.
 
 ### Installing dependencies
 

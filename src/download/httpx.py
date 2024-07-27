@@ -1,11 +1,10 @@
 from json import dumps
 from logging import getLogger
-from time import sleep
 
 from geopandas import read_file
 from pandas import to_datetime
 
-from .utils import WAIT, client_get, outputs
+from .utils import client_get, outputs
 
 logger = getLogger(__name__)
 
@@ -21,8 +20,8 @@ def get_query_count(url: str, idx: int):
     return f"{url}/{idx}/query?f=json&where=1=1&returnCountOnly=true"
 
 
-def save_file(text: str, filename: str):
-    gdf = read_file(text, use_arrow=True)
+def save_file(data: dict, filename: str):
+    gdf = read_file(dumps(data), use_arrow=True)
     gdf = gdf.drop(columns=["OBJECTID"], errors="ignore")
     for col in gdf.select_dtypes(include=["datetime"]):
         gdf[col] = to_datetime(gdf[col], utc=True)
@@ -32,19 +31,18 @@ def save_file(text: str, filename: str):
 def download(iso3: str, lvl: int, idx: int, url: str):
     filename = f"{iso3}_adm{lvl}".lower()
     query = get_query(url, idx)
-    esri_text = client_get(query).text
-    if not esri_text.startswith('{"error":'):
-        save_file(esri_text, filename)
+    esri_json = client_get(query).json()
+    if "error" not in esri_json and "exceededTransferLimit" not in esri_json:
+        save_file(esri_json, filename)
     else:
         query_count = get_query_count(url, idx)
         count = client_get(query_count).json()["count"]
+        result = None
         for records in [1000, 100, 10, 1]:
-            result = None
             for offset in range(0, count, records):
                 query = get_query(url, idx, records, offset)
                 esri_json = client_get(query).json()
                 if "error" in esri_json:
-                    sleep(WAIT)
                     break
                 else:
                     if result is None:
@@ -52,5 +50,7 @@ def download(iso3: str, lvl: int, idx: int, url: str):
                     else:
                         result["features"].extend(esri_json["features"])
             if result is not None:
-                save_file(dumps(result), filename)
+                save_file(result, filename)
                 break
+        if result is None:
+            raise RuntimeError(filename)
