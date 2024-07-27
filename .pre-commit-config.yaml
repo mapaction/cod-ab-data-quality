@@ -12,6 +12,7 @@ repos:
         entry: poetry run isort
         language: system
         types: [file, python]
+        args: ["--profile", "black", "--filter-files"]
       - id: flake8
         name: flake8
         entry: poetry run flake8
