@@ -37,8 +37,8 @@ def download(iso3: str, lvl: int, idx: int, url: str):
     else:
         query_count = get_query_count(url, idx)
         count = client_get(query_count).json()["count"]
-        result = None
         for records in [1000, 100, 10, 1]:
+            result = None
             for offset in range(0, count, records):
                 query = get_query(url, idx, records, offset)
                 esri_json = client_get(query).json()
@@ -52,5 +52,5 @@ def download(iso3: str, lvl: int, idx: int, url: str):
             if result is not None:
                 save_file(result, filename)
                 break
-        if result is None:
+        if not (outputs / f"{filename}.gpkg").is_file():
             raise RuntimeError(filename)
