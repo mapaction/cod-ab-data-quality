@@ -1,9 +1,9 @@
-import pytest
+from pytest import mark
 
 from src.table_data_formatting import table_data_formatting_has_data_cols
 
 
-@pytest.mark.parametrize(
+@mark.parametrize(
     "admin_level,expected_value",
     [
         (0, 1),

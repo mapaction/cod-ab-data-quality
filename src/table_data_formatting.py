@@ -20,7 +20,7 @@ def table_data_formatting_has_data_cols(shapefile_path: str) -> float:
     sf = shapefile.Reader(shapefile_path)
     field_names = (field[0] for field in sf.fields)
     for name in field_names:
-        if re.match(admin_boundary_regex, name):
+        if re.match(admin_boundary_regex, name, re.IGNORECASE):
             return 1
     return 0
 
@@ -52,10 +52,13 @@ def table_data_formatting_has_hierarchical_cols(shapefile_path: str) -> float:
         admin_level = int(match.group(1))
         seen_numbers = set()
         field_names = (field[0] for field in sf.fields)
+        # Find all the numbers in column names (e.g. '3' in ADM3_PCODE).
         for name in field_names:
             if match := re.match(admin_boundary_regex, name, re.IGNORECASE):
                 seen_numbers.add(int(match.group(1)))
         number_of_matches = 0
+        # Count backwards, checking lower numbers are
+        # in col names (e.g. 2,1,0 for ADM2_*).
         for i in range(admin_level, -1, -1):
             if i in seen_numbers:
                 number_of_matches += 1
