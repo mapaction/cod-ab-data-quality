@@ -9,7 +9,7 @@ from src.table_data_formatting import table_data_formatting_has_data_cols
         (0, 1),
         (1, 1),
         (2, 1),
-        (3, 0),
+        (3, 1),
     ],
 )
 def test_table_data_formatting_has_data_cols_adm3(admin_level, expected_value):
