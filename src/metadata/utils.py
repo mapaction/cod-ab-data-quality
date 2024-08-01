@@ -14,7 +14,7 @@ getLogger("httpx").setLevel(WARNING)
 
 ATTEMPT = 5
 WAIT = 10
-TIMEOUT = 20
+TIMEOUT = 60
 
 cwd = Path(__file__).parent
 
