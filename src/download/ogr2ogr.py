@@ -2,7 +2,9 @@ from logging import getLogger
 from re import compile
 from subprocess import DEVNULL, run
 
-from .utils import outputs
+from tenacity import retry, stop_after_attempt, wait_fixed
+
+from .utils import ATTEMPT, WAIT, outputs
 
 logger = getLogger(__name__)
 
@@ -29,6 +31,7 @@ def is_valid(file):
     return regex.search(result.stdout.decode("utf-8"))
 
 
+@retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
 def download(iso3: str, lvl: int, idx: int, url: str):
     filename = f"{iso3}_adm{lvl}".lower()
     for records in [None, 1000, 100, 10, 1]:
