@@ -14,7 +14,7 @@ getLogger("httpx").setLevel(WARNING)
 
 ATTEMPT = 5
 WAIT = 10
-TIMEOUT = 600
+TIMEOUT = 60
 
 cwd = Path(__file__).parent
 
@@ -24,11 +24,6 @@ columns = [
     "name",
     "itos_url",
     "itos_service",
-    "itos_date",
-    "itos_update",
-    "itos_language_1",
-    "itos_language_2",
-    "itos_language_3",
     "itos_level",
     "itos_index_0",
     "itos_index_1",
@@ -69,11 +64,6 @@ def join_hdx_metadata(row, hdx):
 def join_itos_metadata(row, itos):
     row["itos_url"] = itos["url"]
     row["itos_service"] = itos["path"]
-    row["itos_date"] = itos["date"]
-    row["itos_update"] = itos["update"]
-    for n in range(3):
-        lang = itos["langs"][n] if n < len(itos["langs"]) else None
-        row[f"itos_language_{n+1}"] = lang
     row["itos_level"] = list(itos["indexes"].keys())[-1]
     for n in range(5):
         row[f"itos_index_{n}"] = itos["indexes"].get(n)
