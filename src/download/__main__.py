@@ -3,12 +3,19 @@ from shutil import which
 
 from tqdm import tqdm
 
-from . import httpx, ogr2ogr
-from .utils import get_metadata, outputs
+from . import httpx, ogr2ogr, outputs
+from .utils import get_metadata
 
 logger = getLogger(__name__)
 
-if __name__ == "__main__":
+
+def main():
+    """Downloads all available COD boundary data from ITOS ArcGIS server.
+
+    Uses the metadata.csv sheet generated with a separate module to iterate through each
+    ISO-3 country code (AFG, AGO, ARE), getting a list of all admin layers (ADM0, ADM1,
+    ADM2, etc), downloading all to a local directory.
+    """
     logger.info("starting")
     outputs.mkdir(parents=True, exist_ok=True)
     download = ogr2ogr.download if which("ogr2ogr") else httpx.download
@@ -21,3 +28,7 @@ if __name__ == "__main__":
         pbar.set_postfix_str(f"{iso3}_ADM{lvl}")
         download(iso3, lvl, idx, row["itos_url"])
     logger.info("finished")
+
+
+if __name__ == "__main__":
+    main()

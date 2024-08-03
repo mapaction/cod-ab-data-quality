@@ -26,3 +26,9 @@ ruff = "^0.5.5"
 [build-system]
 build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core"]
+
+[tool.ruff.lint]
+select = ["D", "E4", "E7", "E9", "F"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

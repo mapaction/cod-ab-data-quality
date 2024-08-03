@@ -4,7 +4,7 @@ from subprocess import DEVNULL, run
 
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from .utils import ATTEMPT, WAIT, outputs
+from . import ATTEMPT, WAIT, outputs
 
 logger = getLogger(__name__)
 

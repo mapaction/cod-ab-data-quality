@@ -1,47 +1,56 @@
-from logging import INFO, WARNING, basicConfig, getLogger
-from os import environ, getenv
-from pathlib import Path
+from os import getenv
 
-from dotenv import load_dotenv
 from httpx import Client
 from pandas import read_csv
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-load_dotenv(override=True)
-basicConfig(
-    level=INFO,
-    format="%(asctime)s - %(name)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-getLogger("httpx").setLevel(WARNING)
-getLogger("pyogrio._io").setLevel(WARNING)
-
-environ["OGR_GEOJSON_MAX_OBJ_SIZE"] = "0"
-environ["OGR_ORGANIZE_POLYGONS"] = "ONLY_CCW"
-
-ATTEMPT = 5
-WAIT = 10
-TIMEOUT = 600
-
-cwd = Path(__file__).parent
-outputs = cwd / "../../data/itos"
+from . import ATTEMPT, TIMEOUT, WAIT, cwd
 
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
 def client_get(url: str):
+    """HTTP GET with retries, waiting, and longer timeouts.
+
+    Args:
+        url: A valid URL.
+
+    Returns:
+        HTTP response.
+    """
     with Client(http2=True, timeout=TIMEOUT) as client:
         return client.get(url)
 
 
-def clean_list(items: list):
+def clean_list(items: list[str]):
+    """Strips whitespace and uppercases a list of strings, removing empty strings.
+
+    Args:
+        items: A list of str
+
+    Returns:
+        A list of strings uppercased and with whitespace trimmed.
+    """
     return [item.strip().upper() for item in items if item.strip() != ""]
 
 
 def get_iso3():
+    """Gets a list of ISO-3 values from an environment variable.
+
+    Returns:
+        List of ISO-3 values cleaned of potential human error.
+    """
     return clean_list(getenv("ISO3", "").split(","))
 
 
 def get_metadata():
+    """Load the metadata table and create a list with every COD admin layer to download.
+
+    For example, returns entries for AFG_ADM0, AFG_ADM1, AFG_ADM2, AGO_ADM0, etc.
+
+    Returns:
+        List containing the following information to download each COD: ISO-3 code,
+        admin level, URL and layer index of the COD on the ArcGIS server.
+    """
     dtypes = {
         "itos_level": "Int8",
         "itos_index_0": "Int8",
