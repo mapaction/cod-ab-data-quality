@@ -18,6 +18,8 @@ WAIT = int(getenv("WAIT", "10"))
 TIMEOUT = int(getenv("TIMEOUT", "60"))
 
 cwd = Path(__file__).parent
+tables = cwd / "../../data/tables"
+tables.mkdir(parents=True, exist_ok=True)
 
 columns = [
     "iso3",

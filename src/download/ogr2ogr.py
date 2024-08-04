@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from . import ATTEMPT, WAIT, outputs
+from . import ATTEMPT, WAIT, boundaries
 
 logger = getLogger(__name__)
 
@@ -46,7 +46,7 @@ def ogr2ogr(idx: int, url: str, filename: str, records: int):
         "orderByFields": "OBJECTID",
         "resultRecordCount": records,
     }
-    dst_dataset = outputs / f"{filename}.gpkg"
+    dst_dataset = boundaries / f"{filename}.gpkg"
     src_dataset = f"{url}/{idx}/query?{urlencode(query)}"
     return run(
         [
@@ -106,5 +106,5 @@ def download(iso3: str, lvl: int, idx: int, url: str):
         result = ogr2ogr(idx, url, filename, records)
         if result.returncode == 0:
             break
-    if not is_polygon(outputs / f"{filename}.gpkg"):
+    if not is_polygon(boundaries / f"{filename}.gpkg"):
         raise RuntimeError(filename)

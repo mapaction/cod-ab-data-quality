@@ -4,7 +4,7 @@ from httpx import Client
 from pandas import read_csv
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from . import ATTEMPT, TIMEOUT, WAIT, cwd
+from . import ATTEMPT, TIMEOUT, WAIT, tables
 
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
@@ -60,7 +60,7 @@ def get_metadata():
         "itos_index_3": "Int8",
         "itos_index_4": "Int8",
     }
-    df = read_csv(cwd / "../../data/metadata.csv", dtype=dtypes)
+    df = read_csv(tables / "metadata.csv", dtype=dtypes)
     records = df.to_dict("records")
     iso3_list = get_iso3()
     if len(iso3_list):

@@ -3,7 +3,7 @@ from shutil import which
 
 from tqdm import tqdm
 
-from . import httpx, ogr2ogr, outputs
+from . import httpx, ogr2ogr
 from .utils import get_metadata
 
 logger = getLogger(__name__)
@@ -20,7 +20,6 @@ def main():
     efficient. If unavailable, fall back to using HTTPX.
     """
     logger.info("starting")
-    outputs.mkdir(parents=True, exist_ok=True)
     download = ogr2ogr.download if which("ogr2ogr") else httpx.download
     metadata = get_metadata()
     pbar = tqdm(metadata)

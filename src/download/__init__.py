@@ -22,4 +22,6 @@ WAIT = 10
 TIMEOUT = 600
 
 cwd = Path(__file__).parent
-outputs = cwd / "../../data/boundaries"
+tables = cwd / "../../data/tables"
+boundaries = cwd / "../../data/boundaries"
+boundaries.mkdir(parents=True, exist_ok=True)
