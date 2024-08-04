@@ -15,6 +15,9 @@ def main():
     Uses the metadata.csv sheet generated with a separate module to iterate through each
     ISO-3 country code (AFG, AGO, ARE), getting a list of all admin layers (ADM0, ADM1,
     ADM2, etc), downloading all to a local directory.
+
+    Uses OGR2OGR if available for downloading, as this is faster and more memory
+    efficient. If unavailable, fall back to using HTTPX.
     """
     logger.info("starting")
     outputs.mkdir(parents=True, exist_ok=True)

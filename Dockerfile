@@ -14,7 +14,8 @@ COPY poetry.toml ./
 COPY pyproject.toml ./
 RUN poetry install --no-root
 
-COPY data/.gitignore ./data/.gitignore
+COPY data/boundaries/.gitignore ./data/boundaries/.gitignore
+COPY data/tables/.gitignore ./data/tables/.gitignore
 COPY src ./src
 COPY tests ./tests
 COPY Makefile ./

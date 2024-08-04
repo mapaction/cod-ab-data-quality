@@ -16,9 +16,9 @@ def get_hdx_metadata(iso3: str):
     Returns:
         A complete package of metadata describing the COD resource on HDX.
     """
-    id = f"cod-ab-{iso3.lower()}"
-    url = f"https://data.humdata.org/api/3/action/package_show?id={id}"
-    result: dict = client_get(url).json().get("result")
+    url = "https://data.humdata.org/api/3/action/package_show"
+    params = {"id": f"cod-ab-{iso3.lower()}"}
+    result: dict = client_get(url, params).json().get("result")
     return result
 
 
@@ -33,7 +33,7 @@ def get_service_url(directory: str, iso3: str):
         The URL for a COD's ArcGIS Feature Service.
     """
     base = "https://codgis.itos.uga.edu/arcgis/rest/services"
-    return f"{base}/{directory}/{iso3}_pcode/FeatureServer?f=json"
+    return f"{base}/{directory}/{iso3}_pcode/FeatureServer"
 
 
 def get_service(iso3: str):
@@ -46,13 +46,14 @@ def get_service(iso3: str):
         Metadata about a COD, including the list of layers available for a location,
         which service directory it belongs to, and the URL of the service.
     """
+    params = {"f": "json"}
     directory = "COD_External"
     url = get_service_url(directory, iso3)
-    service = client_get(url).json()
+    service = client_get(url, params).json()
     if "error" in service:
         directory = "COD_NO_GEOM_CHECK"
         url = get_service_url(directory, iso3)
-        service = client_get(url).json()
+        service = client_get(url, params).json()
         if "error" in service:
             service = {"layers": None}
     return service["layers"], directory, url.split("?")[0]

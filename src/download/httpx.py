@@ -11,34 +11,7 @@ from .utils import client_get
 logger = getLogger(__name__)
 
 
-def get_query(url: str, idx: int, records: int | None, offset: int | None):
-    """Builds a URL used for retrieving ESRI JSON from an ArcGIS Feature Service.
-
-    The query parameter "f" (format) is set to return JSON (default is HTML), "where" is
-    a required parameter with the value "1=1" to return all features, "outFields" is set
-    to "*" specifying to return all fields (default is only first field), and
-    "orderByFields" is required for pagination to ensure that features are always
-    ordered the same way and duplicates are not returned when paginating. For layers
-    where the number of features exceeds the "maxRecordCount" property, add
-    "resultRecordCount" and "resultOffset" query parameters to paginate through results.
-
-    Args:
-        url: Base URL of an ArcGIS Feature Service.
-        idx: Index of a feature service layer.
-        records: The number of records to fetch from the server per request.
-        offset: For pagination, skips the specified number of records and starts from
-        the next record.
-
-    Returns:
-        URL which returns ESRI JSON.
-    """
-    query = "f=json&where=1=1&outFields=*&orderByFields=OBJECTID"
-    q_record = f"&resultRecordCount={records}" if records is not None else ""
-    q_offset = f"&resultOffset={offset}" if offset is not None else ""
-    return f"{url}/{idx}/query?{query}{q_record}{q_offset}"
-
-
-def get_query_count(url: str, idx: int):
+def get_layer_count(url: str, idx: int):
     """Gets a URL containing the total number of features in a layer.
 
     The query parameter "f" (format) is set to return JSON (default is HTML), "where" is
@@ -51,9 +24,48 @@ def get_query_count(url: str, idx: int):
         idx: Index of a feature service layer.
 
     Returns:
-        URL containing information on the total number of features in a layer.
+        URL and query parameters containing information on the total number of features
+        in a layer.
     """
-    return f"{url}/{idx}/query?f=json&where=1=1&returnCountOnly=true"
+    query = {
+        "f": "json",
+        "where": "1=1",
+        "returnCountOnly": True,
+    }
+    return f"{url}/{idx}/query", query
+
+
+def get_layer(url: str, idx: int, records: int, offset: int):
+    """Builds a URL used for retrieving ESRI JSON from an ArcGIS Feature Service.
+
+    The query parameter "f" (format) is set to return JSON (default is HTML), "where" is
+    a required parameter with the value "1=1" to return all features, "outFields" is set
+    to "*" specifying to return all fields (default is only first field),
+    "orderByFields" is required for pagination to ensure that features are always
+    ordered the same way and duplicates are not returned when paginating. Finally,
+    "resultRecordCount" and "resultOffset" query parameters are used to paginate through
+    results.
+
+    Args:
+        url: Base URL of an ArcGIS Feature Service.
+        idx: Index of a feature service layer.
+        records: The number of records to fetch from the server per request during
+        pagination.
+        offset: For pagination, skips the specified number of records and starts from
+        the next record.
+
+    Returns:
+        URL and query parameters which returns ESRI JSON.
+    """
+    query = {
+        "f": "json",
+        "where": "1=1",
+        "outFields": "*",
+        "orderByFields": "OBJECTID",
+        "resultRecordCount": records,
+        "resultOffset": offset,
+    }
+    return f"{url}/{idx}/query", query
 
 
 def save_file(data: dict, filename: str):
@@ -78,6 +90,10 @@ def save_file(data: dict, filename: str):
     with open(tmp, "w") as f:
         dump(data, f, separators=(",", ":"))
     gdf = read_file(tmp, use_arrow=True)
+    is_polygon = "Polygon" in gdf["geometry"].geom_type.values
+    is_multi_polygon = "MultiPolygon" in gdf["geometry"].geom_type.values
+    if not is_polygon and not is_multi_polygon:
+        raise RuntimeError(filename)
     gdf = gdf.drop(columns=["OBJECTID"], errors="ignore")
     for col in gdf.select_dtypes(include=["datetime"]):
         gdf[col] = to_datetime(gdf[col], utc=True)
@@ -89,18 +105,12 @@ def save_file(data: dict, filename: str):
 def download(iso3: str, lvl: int, idx: int, url: str):
     """Downloads ESRI JSON from an ArcGIS Feature Server and saves as GeoPackage.
 
-    First, attempts to download ESRI JSON in a single request. This request may fail due
-    to memory issues on the server, in which case the result will return the key
-    "error". Additionally, if the number of features returned exceeds the
-    "maxRecordCount" property, it will contain the key "exceededTransferLimit" in the
-    result indicating that only part of the dataset has been downloaded.
-
-    If either of the above errors are encountered, make a query to obtain the total
-    number of records for a layer. Starting with "1000" and reducing by factors of "10",
-    try to paginate through the layer with multiple requests. "1000" is a value that
-    will succeed for most layers, however layers with excessively large geometries will
-    require smaller sets of records to avoid overloading the server's memory. When all
-    records have been obtained through pagination, save the result.
+    First, make a query to obtain the total number of records for a layer. Starting with
+    "1000" and reducing by factors of "10", try to paginate through the layer with
+    multiple requests. "1000" is a value that will succeed for most layers, however
+    layers with excessively large geometries will require smaller sets of records to
+    avoid overloading the server's memory. When all records have been obtained through
+    pagination, save the result.
 
     If at the end of this loop, the function is unable to download a layer, it is likely
     that a network error has occured. The RuntimeError will trigger tenacity to retry
@@ -117,27 +127,22 @@ def download(iso3: str, lvl: int, idx: int, url: str):
         downloaded.
     """
     filename = f"{iso3}_adm{lvl}".lower()
-    query = get_query(url, idx, None, None)
-    esri_json = client_get(query).json()
-    if "error" not in esri_json and "exceededTransferLimit" not in esri_json:
-        save_file(esri_json, filename)
-    else:
-        query_count = get_query_count(url, idx)
-        count = client_get(query_count).json()["count"]
-        for records in [1000, 100, 10, 1]:
-            result = None
-            for offset in range(0, count, records):
-                query = get_query(url, idx, records, offset)
-                esri_json = client_get(query).json()
-                if "error" in esri_json:
-                    break
-                else:
-                    if result is None:
-                        result = esri_json
-                    else:
-                        result["features"].extend(esri_json["features"])
-            if result is not None:
-                save_file(result, filename)
+    count_url, count_query = get_layer_count(url, idx)
+    count = client_get(count_url, count_query).json()["count"]
+    for records in [1000, 100, 10, 1]:
+        result = None
+        for offset in range(0, count, records):
+            layer_url, layer_query = get_layer(url, idx, records, offset)
+            esri_json = client_get(layer_url, layer_query).json()
+            if "error" in esri_json:
                 break
-        if not (outputs / f"{filename}.gpkg").is_file():
-            raise RuntimeError(filename)
+            else:
+                if result is None:
+                    result = esri_json
+                else:
+                    result["features"].extend(esri_json["features"])
+        if result is not None:
+            save_file(result, filename)
+            break
+    if not (outputs / f"{filename}.gpkg").is_file():
+        raise RuntimeError(filename)

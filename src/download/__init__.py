@@ -22,4 +22,4 @@ WAIT = 10
 TIMEOUT = 600
 
 cwd = Path(__file__).parent
-outputs = cwd / "../../data/itos"
+outputs = cwd / "../../data/boundaries"
