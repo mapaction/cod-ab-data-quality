@@ -11,7 +11,7 @@ from . import ATTEMPT, WAIT, boundaries
 logger = getLogger(__name__)
 
 
-def ogr2ogr(idx: int, url: str, filename: str, records: int):
+def ogr2ogr(idx: int, url: str, filename: str, records: int | None):
     """Uses OGR2OGR to download ESRI JSON from an ArcGIS server to local GeoPackage.
 
     The query parameter "f" (format) is set to return JSON (default is HTML), "where" is
@@ -39,13 +39,14 @@ def ogr2ogr(idx: int, url: str, filename: str, records: int):
         A subprocess completed process, including a returncode stating whether the run
         was successfun or not.
     """
-    query = {
+    query: dict = {
         "f": "json",
         "where": "1=1",
         "outFields": "*",
         "orderByFields": "OBJECTID",
-        "resultRecordCount": records,
     }
+    if records is not None:
+        query["resultRecordCount"] = records
     dst_dataset = boundaries / f"{filename}.gpkg"
     src_dataset = f"{url}/{idx}/query?{urlencode(query)}"
     return run(
@@ -81,11 +82,15 @@ def is_polygon(file: Path):
 def download(iso3: str, lvl: int, idx: int, url: str):
     """Downloads ESRI JSON from an ArcGIS Feature Server and saves as GeoPackage.
 
-    Starting with "1000" and reducing by factors of "10", try to paginate through the
-    layer with multiple requests. "1000" is a value that will succeed for most layers,
-    however layers with excessively large geometries will require smaller sets of
-    records to avoid overloading the server's memory. When all records have been
-    obtained through pagination, save the result.
+    First, attempts to download ESRI JSON paginating through the layer with the value
+    set by "maxRecordCount" (default behavior when "resultRecordCount" is unspecified).
+    This request may fail due to memory issues on the server.
+
+    Then, starting with "1000" and reducing by factors of "10", try to paginate through
+    the layer. "1000" is a value that will succeed for most layers, however layers with
+    excessively large geometries will require smaller sets of records to avoid
+    overloading the server's memory. When all records have been obtained through
+    pagination, save the result.
 
     If at the end of this loop, the function is unable to download a layer, it is likely
     that a network error has occured. The RuntimeError will trigger tenacity to retry
@@ -102,7 +107,7 @@ def download(iso3: str, lvl: int, idx: int, url: str):
         downloaded.
     """
     filename = f"{iso3}_adm{lvl}".lower()
-    for records in [1000, 100, 10, 1]:
+    for records in [None, 1000, 100, 10, 1]:
         result = ogr2ogr(idx, url, filename, records)
         if result.returncode == 0:
             break
