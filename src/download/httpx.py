@@ -5,7 +5,7 @@ from geopandas import read_file
 from pandas import to_datetime
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from . import ATTEMPT, WAIT, boundaries
+from .config import ATTEMPT, WAIT, boundaries
 from .utils import client_get
 
 logger = getLogger(__name__)

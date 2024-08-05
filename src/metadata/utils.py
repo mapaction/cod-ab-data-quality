@@ -1,7 +1,7 @@
 from httpx import Client
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from . import ATTEMPT, TIMEOUT, WAIT
+from .config import ATTEMPT, TIMEOUT, WAIT
 
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))

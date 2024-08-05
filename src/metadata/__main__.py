@@ -3,7 +3,7 @@ from logging import getLogger
 from pandas import DataFrame
 from tqdm import tqdm
 
-from . import columns, tables
+from .config import columns, tables
 from .getters import get_hdx_metadata, get_itos_metadata
 from .utils import client_get, join_hdx_metadata, join_itos_metadata
 

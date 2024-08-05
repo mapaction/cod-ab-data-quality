@@ -4,7 +4,7 @@ from httpx import Client
 from pandas import read_csv
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from . import ATTEMPT, TIMEOUT, WAIT, tables
+from .config import ATTEMPT, TIMEOUT, WAIT, tables
 
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
