@@ -1,4 +1,4 @@
-""" The main entry point to the script """
+"""The main entry point to the script"""
 
 from src.table_data_completeness import table_data_completeness
 

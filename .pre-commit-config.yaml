@@ -2,19 +2,16 @@ fail_fast: true
 repos:
   - repo: local
     hooks:
-      - id: black
-        name: black
-        entry: poetry run black
+      - id: ruff-lint
+        name: ruff-lint
+        entry: poetry run ruff check
+        args: [--select, I, --fix, --no-cache]
         language: system
         types: [file, python]
-      - id: isort
-        name: isort
-        entry: poetry run isort
-        language: system
-        types: [file, python]
-      - id: flake8
-        name: flake8
-        entry: poetry run flake8
+      - id: ruff-format
+        name: ruff-format
+        entry: poetry run ruff format
+        args: [--no-cache]
         language: system
         types: [file, python]
       - id: pymarkdown
@@ -22,9 +19,3 @@ repos:
         entry: poetry run pymarkdown scan
         language: system
         types: [file, markdown]
-      - id: nbqa-black
-        name: nbqa-black
-        entry: poetry run nbqa black
-        language: system
-        files: \.ipynb$
-        args: ["--nbqa-mutate"]

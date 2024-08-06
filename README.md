@@ -59,3 +59,34 @@ poetry run pre-commit install
 ```bash
 poetry add [package-name]
 ```
+
+### Optional dependancies
+
+[GDAL](https://gdal.org/download.html) is an optional dependancy which enables file
+downloading through `ogr2ogr`,
+which is quicker and more memory efficient than using `httpx`.
+If not installed,
+`httpx` and `geopandas` with `pyarrow` will be used to download files.
+
+To ensure that all commands are able to run in the cloud, it's encouraged to install
+[Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+### Environment file
+
+For variables which change between runs, a dotenv file is used.
+Use the example file as a starting point to make a copy from.
+
+```bash
+cp .env.example .env
+```
+
+### Running commands
+
+Most commands can be accessed through `make`.
+In particular, `make run` will run all commands of this project in sequence.
+
+Alternatively, `make run` can be run through the Docker command:
+
+```bash
+docker compose up --build
+```

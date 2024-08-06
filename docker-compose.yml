@@ -1,0 +1,8 @@
+services:
+  cod-ab-data-quality:
+    build: .
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./data:/usr/src/app/data
