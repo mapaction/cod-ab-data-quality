@@ -1,6 +1,6 @@
 """The main entry point to the script"""
 
-from src.table_data_completeness import table_data_completeness
+from src.check_table_completeness.table_data_completeness import table_data_completeness
 
 
 def main():

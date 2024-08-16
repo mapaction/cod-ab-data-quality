@@ -32,10 +32,15 @@ download:
 	@echo "Downloading boundaries"
 	@poetry run python -m src.download
 
+table_data_completeness:
+	@echo "Testing table data completeness"
+	@poetry run python -m src.table_data_completeness
+
 run:
 	@echo "Running all commands"
 	@make metadata
 	@make download
+	@make table_data_completeness
 
 help:
 	@echo "Available make targets:"
