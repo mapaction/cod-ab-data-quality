@@ -1,3 +1,5 @@
+"""Download functions using GDAL, runs faster than HTTPX."""
+
 from logging import getLogger
 from pathlib import Path
 from re import compile
@@ -6,7 +8,7 @@ from urllib.parse import urlencode
 
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from .config import ATTEMPT, WAIT, boundaries
+from ..config import ATTEMPT, WAIT, boundaries
 
 logger = getLogger(__name__)
 

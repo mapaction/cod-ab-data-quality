@@ -1,22 +1,4 @@
-from httpx import Client
-from tenacity import retry, stop_after_attempt, wait_fixed
-
-from .config import ATTEMPT, TIMEOUT, WAIT
-
-
-@retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
-def client_get(url: str, params: dict | None = None):
-    """HTTP GET with retries, waiting, and longer timeouts.
-
-    Args:
-        url: A valid URL.
-        params: Optional URL query parameters included in the request.
-
-    Returns:
-        HTTP response.
-    """
-    with Client(http2=True, timeout=TIMEOUT) as client:
-        return client.get(url, params=params)
+"""Functions for adding properties to existing dictionaries."""
 
 
 def join_hdx_metadata(row: dict, hdx: dict):

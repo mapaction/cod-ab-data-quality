@@ -1,3 +1,5 @@
+"""Miscellaneous utilities."""
+
 from os import getenv
 
 from httpx import Client
@@ -22,25 +24,15 @@ def client_get(url: str, params: dict | None = None):
         return client.get(url, params=params)
 
 
-def clean_list(items: list[str]):
-    """Strips whitespace and uppercases a list of strings, removing empty strings.
-
-    Args:
-        items: A list of str
-
-    Returns:
-        A list of strings uppercased and with whitespace trimmed.
-    """
-    return [item.strip().upper() for item in items if item.strip() != ""]
-
-
 def get_iso3():
     """Gets a list of ISO-3 values from an environment variable.
 
     Returns:
         List of ISO-3 values cleaned of potential human error.
     """
-    return clean_list(getenv("ISO3", "").split(","))
+    iso3_list = getenv("ISO3", "").split(",")
+    iso3_list_cleaned = [x.strip().upper() for x in iso3_list if x.strip() != ""]
+    return iso3_list_cleaned
 
 
 def get_metadata():
@@ -65,9 +57,4 @@ def get_metadata():
     iso3_list = get_iso3()
     if len(iso3_list):
         records = [x for x in records if x["iso3"] in iso3_list]
-    result = []
-    for record in records:
-        for level in range(5):
-            if record[f"itos_index_{level}"] is not None:
-                result.append({**record, "admin_level": level})
-    return result
+    return records

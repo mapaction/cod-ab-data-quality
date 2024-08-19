@@ -1,14 +1,17 @@
-"""The main entry point to the script"""
+"""The main entry point to the script."""
 
-from src.table_data_completeness import table_data_completeness
+from .checks.__main__ import main as checks
+from .download.__main__ import main as download
+from .metadata.__main__ import main as metadata
+from .scores.__main__ import main as scores
 
 
 def main():
-    table_completeness = table_data_completeness(
-        "../tests/test_data/mdg_adm_bngrc_ocha_20181031_shp/"
-        "mdg_admbnda_adm2_BNGRC_OCHA_20181031.dbf"
-    )
-    print(table_completeness)
+    """Main function."""
+    metadata()
+    download()
+    checks()
+    scores()
 
 
 if __name__ == "__main__":

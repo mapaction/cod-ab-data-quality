@@ -1,6 +1,8 @@
+"""Utility functions for getting various data."""
+
 from re import compile
 
-from .utils import client_get
+from ..utils import client_get
 
 
 def get_hdx_metadata(iso3: str):
