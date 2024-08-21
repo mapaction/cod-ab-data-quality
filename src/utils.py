@@ -6,7 +6,7 @@ from httpx import Client
 from pandas import read_csv
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from .config import ATTEMPT, WAIT, tables
+from .config import ATTEMPT, WAIT, args, tables
 
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
@@ -26,12 +26,14 @@ def client_get(url: str, timeout: int, params: dict | None = None):
 
 
 def get_iso3():
-    """Gets a list of ISO-3 values from an environment variable.
+    """Gets a list of ISO-3 values from an environment variable or argparser.
 
     Returns:
         List of ISO-3 values cleaned of potential human error.
     """
     iso3_list = getenv("ISO3", "").split(",")
+    if args.iso3:
+        iso3_list = args.iso3.split(",")
     iso3_list_cleaned = [x.strip().upper() for x in iso3_list if x.strip() != ""]
     return iso3_list_cleaned
 
