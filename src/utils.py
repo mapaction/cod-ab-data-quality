@@ -6,21 +6,22 @@ from httpx import Client
 from pandas import read_csv
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from .config import ATTEMPT, TIMEOUT, WAIT, tables
+from .config import ATTEMPT, WAIT, tables
 
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
-def client_get(url: str, params: dict | None = None):
+def client_get(url: str, timeout: int, params: dict | None = None):
     """HTTP GET with retries, waiting, and longer timeouts.
 
     Args:
         url: A valid URL.
+        timeout: Amount in seconds to wait between retries.
         params: Optional URL query parameters included in the request.
 
     Returns:
         HTTP response.
     """
-    with Client(http2=True, timeout=TIMEOUT) as client:
+    with Client(http2=True, timeout=timeout) as client:
         return client.get(url, params=params)
 
 

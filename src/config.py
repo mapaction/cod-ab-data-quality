@@ -21,7 +21,8 @@ environ["OGR_ORGANIZE_POLYGONS"] = "ONLY_CCW"
 
 ATTEMPT = int(getenv("ATTEMPT", "5"))
 WAIT = int(getenv("WAIT", "10"))
-TIMEOUT = int(getenv("TIMEOUT", "600"))
+TIMEOUT = int(getenv("TIMEOUT", "60"))
+TIMEOUT_DOWNLOAD = int(getenv("TIMEOUT_DOWNLOAD", "600"))
 
 cwd = Path(__file__).parent
 tables = cwd / "../data/tables"

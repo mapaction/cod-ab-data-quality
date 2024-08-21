@@ -5,7 +5,7 @@ from logging import getLogger
 from pandas import DataFrame
 from tqdm import tqdm
 
-from ..config import metadata_columns, tables
+from ..config import TIMEOUT, metadata_columns, tables
 from ..utils import client_get, get_iso3
 from .getters import get_hdx_metadata, get_itos_metadata
 from .join import join_hdx_metadata, join_itos_metadata
@@ -24,7 +24,7 @@ def get_metadata():
         HDX and ITOS.
     """
     url = "https://vocabulary.unocha.org/json/beta-v4/countries.json"
-    metadata: list[dict] = client_get(url).json()["data"]
+    metadata: list[dict] = client_get(url, TIMEOUT).json()["data"]
     metadata = [x for x in metadata if x["iso3"] is not None]
     iso3_list = get_iso3()
     if len(iso3_list):
