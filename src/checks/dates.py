@@ -3,7 +3,7 @@
 from geopandas import GeoDataFrame
 
 
-def main(result: list, iso3: str, gdfs: list[GeoDataFrame]):
+def main(iso3: str, gdfs: list[GeoDataFrame]):
     """Checks for unique date values within dataset.
 
     There are two date fields within each COD-AB, "date" and "validOn". "date"
@@ -19,11 +19,14 @@ def main(result: list, iso3: str, gdfs: list[GeoDataFrame]):
         - output: "update_1", "update_2", etc...
 
     Args:
-        result: List of check rows to be outputed as a CSV.
         iso3: ISO3 code of the current location being checked.
         gdfs: List of GeoDataFrames, with the item at index 0 corresponding to admin
         level 0, index 1 to admin level 1, etc.
+
+    Returns:
+        List of check rows to be outputed as a CSV.
     """
+    rows = []
     for level, gdf in enumerate(gdfs):
         row = {"iso3": iso3, "level": level}
         try:
@@ -35,4 +38,5 @@ def main(result: list, iso3: str, gdfs: list[GeoDataFrame]):
                 row[f"update_{index+1}"] = value
         except KeyError:
             pass
-        result.append(row)
+        rows.append(row)
+    return rows

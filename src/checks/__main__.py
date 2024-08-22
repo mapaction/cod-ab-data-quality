@@ -52,18 +52,19 @@ def main():
             except DataSourceError:
                 gdf = GeoDataFrame()
             gdfs.append(gdf)
-        for check, result in checks:
-            check.main(result, iso3, gdfs)
-    results = None
-    for _, result in checks:
-        df = DataFrame(result)
-        if results is None:
-            results = df
+        for function, results in checks:
+            rows = function.main(iso3, gdfs)
+            results.extend(rows)
+    output_table = None
+    for _, results in checks:
+        df = DataFrame(results)
+        if output_table is None:
+            output_table = df
         else:
-            results = results.merge(df, on=["iso3", "level"], how="outer")
-    if results is not None:
+            output_table = output_table.merge(df, on=["iso3", "level"], how="outer")
+    if output_table is not None:
         dest = tables / "checks.csv"
-        results.to_csv(dest, encoding="utf-8-sig", index=False)
+        output_table.to_csv(dest, encoding="utf-8-sig", index=False)
     logger.info("finished")
 
 
