@@ -1,10 +1,12 @@
+"""Main entry point for the script."""
+
 from logging import getLogger
 from shutil import which
 
 from tqdm import tqdm
 
+from ..utils import get_metadata
 from . import httpx, ogr2ogr
-from .utils import get_metadata
 
 logger = getLogger(__name__)
 
@@ -21,7 +23,12 @@ def main():
     """
     logger.info("starting")
     download = ogr2ogr.download if which("ogr2ogr") else httpx.download
-    metadata = get_metadata()
+    metadata = []
+    records = get_metadata()
+    for record in records:
+        for level in range(5):
+            if record[f"itos_index_{level}"] is not None:
+                metadata.append({**record, "admin_level": level})
     pbar = tqdm(metadata)
     for row in pbar:
         iso3 = row["iso3"]

@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    gdal-bin make python3-poetry \
+    gdal-bin python3-poetry \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
@@ -12,12 +12,11 @@ WORKDIR /usr/src/app
 COPY poetry.lock ./
 COPY poetry.toml ./
 COPY pyproject.toml ./
-RUN poetry install --no-root
+RUN poetry install --no-root --no-dev --no-cache
+ENV PATH="/usr/src/app/.venv/bin:$PATH"
 
 COPY data/boundaries/.gitignore ./data/boundaries/.gitignore
 COPY data/tables/.gitignore ./data/tables/.gitignore
 COPY src ./src
-COPY tests ./tests
-COPY Makefile ./
 
-CMD ["make", "run"]
+CMD ["python", "-m", "src"]

@@ -1,5 +1,8 @@
+"""Project configuration."""
+
+from argparse import ArgumentParser
 from logging import INFO, WARNING, basicConfig, getLogger
-from os import getenv
+from os import environ, getenv
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -12,16 +15,29 @@ basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 getLogger("httpx").setLevel(WARNING)
+getLogger("pyogrio._io").setLevel(WARNING)
+
+environ["OGR_GEOJSON_MAX_OBJ_SIZE"] = "0"
+environ["OGR_ORGANIZE_POLYGONS"] = "ONLY_CCW"
+
+parser = ArgumentParser()
+parser.add_argument(
+    "--iso3", help="Comma separated list of ISO3 codes used by commands."
+)
+args = parser.parse_args()
 
 ATTEMPT = int(getenv("ATTEMPT", "5"))
 WAIT = int(getenv("WAIT", "10"))
 TIMEOUT = int(getenv("TIMEOUT", "60"))
+TIMEOUT_DOWNLOAD = int(getenv("TIMEOUT_DOWNLOAD", "600"))
 
 cwd = Path(__file__).parent
-tables = cwd / "../../data/tables"
+tables = cwd / "../data/tables"
 tables.mkdir(parents=True, exist_ok=True)
+boundaries = cwd / "../data/boundaries"
+boundaries.mkdir(parents=True, exist_ok=True)
 
-columns = [
+metadata_columns = [
     "iso3",
     "iso2",
     "name",
