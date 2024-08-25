@@ -2,8 +2,10 @@
 
 from geopandas import GeoDataFrame
 
+from src.utils import CheckReturnList
 
-def main(iso3: str, gdfs: list[GeoDataFrame]):
+
+def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
     """Checks for unique date values within dataset.
 
     There are two date fields within each COD-AB, "date" and "validOn". "date"
@@ -27,8 +29,8 @@ def main(iso3: str, gdfs: list[GeoDataFrame]):
         List of check rows to be outputed as a CSV.
     """
     rows = []
-    for level, gdf in enumerate(gdfs):
-        row = {"iso3": iso3, "level": level}
+    for admin_level, gdf in enumerate(gdfs):
+        row = {"iso3": iso3, "level": admin_level}
         try:
             gdf_date = gdf["date"].dt.date.drop_duplicates()
             for index, value in enumerate(gdf_date):

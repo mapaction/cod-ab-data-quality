@@ -4,8 +4,10 @@ from re import compile
 
 from geopandas import GeoDataFrame
 
+from src.utils import CheckReturnList
 
-def main(iso3: str, gdfs: list[GeoDataFrame]):
+
+def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
     """Checks for which languages are used within dataset.
 
     Datasets use the following pattern in their field names for identifying languages:
@@ -28,10 +30,10 @@ def main(iso3: str, gdfs: list[GeoDataFrame]):
         List of check rows to be outputed as a CSV.
     """
     rows = []
-    for level, gdf in enumerate(gdfs):
-        row = {"iso3": iso3, "level": level}
+    for admin_level, gdf in enumerate(gdfs):
+        row = {"iso3": iso3, "level": admin_level}
         columns = list(gdf.columns)
-        p = compile(rf"^ADM{level}_\w{{2}}$")
+        p = compile(rf"^ADM{admin_level}_\w{{2}}$")
         langs = [x.split("_")[1].lower() for x in columns if p.search(x)]
         langs = list(dict.fromkeys(langs))
         for index, lang in enumerate(langs):
