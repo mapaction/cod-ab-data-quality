@@ -1,8 +1,9 @@
 from logging import INFO, WARNING, basicConfig, getLogger
 from os import environ
-from pathlib import Path
 
 from dotenv import load_dotenv
+
+from src import config
 
 load_dotenv(override=True)
 
@@ -21,7 +22,11 @@ ATTEMPT = 5
 WAIT = 10
 TIMEOUT = 600
 
-cwd = Path(__file__).parent
-tables = cwd / "../../data/tables"
-boundaries = cwd / "../../data/boundaries"
+# cwd = Path(__file__).parent
+# tables = cwd / "../../data/tables"
+# boundaries = cwd / "../../data/boundaries"
+
+cwd = config.cwd
+tables = config.tables
+boundaries = config.boundaries
 boundaries.mkdir(parents=True, exist_ok=True)
