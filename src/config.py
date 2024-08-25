@@ -56,3 +56,5 @@ metadata_columns = [
     "hdx_source_2",
     "hdx_license",
 ]
+
+score_columns = ["iso3", "dates", "languages"]

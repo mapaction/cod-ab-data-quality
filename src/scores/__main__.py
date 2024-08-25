@@ -3,24 +3,20 @@
 from logging import getLogger
 
 from pandas import read_csv
-from tqdm import tqdm
 
 from ..config import tables
-from ..utils import get_metadata
+from . import dates, languages, output
 
 logger = getLogger(__name__)
 
 
 def main():
-    """Main function deaft, to be updated with actual functionality."""
+    """Main function draft, to be updated with actual functionality."""
     logger.info("starting")
-    metadata = get_metadata()
-    checks = read_csv(tables / "checks.csv")
-    if checks.empty:
-        raise RuntimeError()
-    pbar = tqdm(metadata)
-    for row in pbar:
-        pbar.set_postfix_str(row["iso3"])
+    df = read_csv(tables / "checks.csv")
+    for check in (languages, dates):
+        df = check.main(df)
+    output.main(df)
     logger.info("finished")
 
 
