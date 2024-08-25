@@ -1,3 +1,5 @@
+"""Download functions using HTTPX, avoiding GDAL install."""
+
 from json import dump
 from logging import getLogger
 
@@ -5,8 +7,8 @@ from geopandas import read_file
 from pandas import to_datetime
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from .config import ATTEMPT, WAIT, boundaries
-from .utils import client_get
+from ..config import ATTEMPT, TIMEOUT, TIMEOUT_DOWNLOAD, WAIT, boundaries
+from ..utils import client_get
 
 logger = getLogger(__name__)
 
@@ -138,17 +140,17 @@ def download(iso3: str, lvl: int, idx: int, url: str):
     """
     filename = f"{iso3}_adm{lvl}".lower()
     layer_url, layer_query = get_layer(url, idx)
-    esri_json = client_get(layer_url, layer_query).json()
+    esri_json = client_get(layer_url, TIMEOUT_DOWNLOAD, layer_query).json()
     if "error" not in esri_json and "exceededTransferLimit" not in esri_json:
         save_file(esri_json, filename)
     else:
         count_url, count_query = get_layer_count(url, idx)
-        count = client_get(count_url, count_query).json()["count"]
+        count = client_get(count_url, TIMEOUT, count_query).json()["count"]
         for records in [1000, 100, 10, 1]:
             result = None
             for offset in range(0, count, records):
                 layer_url, layer_query = get_layer(url, idx, records, offset)
-                esri_json = client_get(layer_url, layer_query).json()
+                esri_json = client_get(layer_url, TIMEOUT_DOWNLOAD, layer_query).json()
                 if "error" in esri_json:
                     break
                 else:

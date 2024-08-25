@@ -14,14 +14,14 @@ pyarrow = "^17.0.0"
 pyshp = "^2.3.1"
 python = "^3.12"
 python-dotenv = "^1.0.1"
-tenacity = "^8.5.0"
-tqdm = "^4.66.4"
+tenacity = "^9.0.0"
+tqdm = "^4.66.5"
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^3.7.1"
-pymarkdownlnt = "^0.9.18"
+pre-commit = "^3.8.0"
+pymarkdownlnt = "^0.9.22"
 pytest = "^8.3.2"
-ruff = "^0.5.5"
+ruff = "^0.6.1"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"

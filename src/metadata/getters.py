@@ -1,6 +1,9 @@
+"""Utility functions for getting various data."""
+
 from re import compile
 
-from .utils import client_get
+from ..config import TIMEOUT
+from ..utils import client_get
 
 
 def get_hdx_metadata(iso3: str):
@@ -18,7 +21,7 @@ def get_hdx_metadata(iso3: str):
     """
     url = "https://data.humdata.org/api/3/action/package_show"
     params = {"id": f"cod-ab-{iso3.lower()}"}
-    result: dict = client_get(url, params).json().get("result")
+    result: dict = client_get(url, TIMEOUT, params).json().get("result")
     return result
 
 
@@ -49,11 +52,11 @@ def get_service(iso3: str):
     params = {"f": "json"}
     directory = "COD_External"
     url = get_service_url(directory, iso3)
-    service = client_get(url, params).json()
+    service = client_get(url, TIMEOUT, params).json()
     if "error" in service:
         directory = "COD_NO_GEOM_CHECK"
         url = get_service_url(directory, iso3)
-        service = client_get(url, params).json()
+        service = client_get(url, TIMEOUT, params).json()
         if "error" in service:
             service = {"layers": None}
     return service["layers"], directory, url.split("?")[0]

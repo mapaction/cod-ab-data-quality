@@ -32,15 +32,17 @@ download:
 	@echo "Downloading boundaries"
 	@poetry run python -m src.download
 
-table_data_completeness:
-	@echo "Testing table data completeness"
-	@poetry run python -m src.table_data_completeness
+checks:
+	@echo "Running checks"
+	@poetry run python -m src.checks
+
+scores:
+	@echo "Calculating scores"
+	@poetry run python -m src.scores
 
 run:
 	@echo "Running all commands"
-	@make metadata
-	@make download
-	@make table_data_completeness
+	@poetry run python -m src
 
 help:
 	@echo "Available make targets:"
@@ -52,4 +54,6 @@ help:
 	@echo " make clean          - Remove .venv"
 	@echo " make metadata       - Generate metadata"
 	@echo " make download       - Download boundaries"
+	@echo " make checks       	- Run checks"
+	@echo " make scores       	- Calculate scores"
 	@echo " make run       		- Run all commands"

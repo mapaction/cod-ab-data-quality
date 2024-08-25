@@ -1,6 +1,6 @@
 from pytest import approx
 
-from src.check_table_completeness.table_data_completeness import table_data_completeness
+from src.checks.table_data_completeness import table_data_completeness
 
 
 def test_mdg_adm0_completeness():
