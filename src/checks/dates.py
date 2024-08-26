@@ -26,9 +26,9 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
         level 0, index 1 to admin level 1, etc.
 
     Returns:
-        List of check rows to be outputed as a CSV.
+        List of results from this check to output as a CSV.
     """
-    rows = []
+    check_results = []
     for admin_level, gdf in enumerate(gdfs):
         row = {"iso3": iso3, "level": admin_level}
         try:
@@ -40,5 +40,5 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                 row[f"update_{index+1}"] = value
         except KeyError:
             pass
-        rows.append(row)
-    return rows
+        check_results.append(row)
+    return check_results
