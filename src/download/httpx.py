@@ -7,8 +7,8 @@ from geopandas import read_file
 from pandas import to_datetime
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from ..config import ATTEMPT, TIMEOUT, TIMEOUT_DOWNLOAD, WAIT, boundaries
-from ..utils import client_get
+from src.config import ATTEMPT, TIMEOUT, TIMEOUT_DOWNLOAD, WAIT, boundaries
+from src.utils import client_get
 
 logger = getLogger(__name__)
 

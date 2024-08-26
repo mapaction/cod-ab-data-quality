@@ -2,8 +2,8 @@
 
 from re import compile
 
-from ..config import TIMEOUT
-from ..utils import client_get
+from src.config import TIMEOUT
+from src.utils import client_get
 
 
 def get_hdx_metadata(iso3: str):

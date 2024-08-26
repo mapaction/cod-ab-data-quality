@@ -2,12 +2,13 @@
 
 from datetime import date
 
-from pandas import DataFrame, ExcelWriter, read_csv
+from pandas import DataFrame, ExcelWriter
 from xlsxwriter import Workbook
 from xlsxwriter.format import Format
 from xlsxwriter.worksheet import Worksheet
 
-from ..config import score_columns, tables
+from src.config import score_columns, tables
+from src.utils import read_csv
 
 
 def get_config(min: float, max: float, format: Format):
@@ -84,7 +85,7 @@ def main(df: DataFrame):
         if isinstance(writer.book, Workbook):
             style(len(df.index), len(df.columns), writer.book, writer.sheets["scores"])
         for sheet in ["checks", "metadata"]:
-            df1 = read_csv(tables / f"{sheet}.csv")
+            df1 = read_csv(tables / f"{sheet}.csv", datetime_to_date=True)
             df1.to_excel(writer, sheet_name=sheet, index=False)
             writer.sheets[sheet].autofit()
         df_date = DataFrame([{"date": date.today()}])

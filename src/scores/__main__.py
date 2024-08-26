@@ -2,9 +2,9 @@
 
 from logging import getLogger
 
-from pandas import read_csv
+from src.config import tables
+from src.utils import read_csv
 
-from ..config import tables
 from . import dates, languages, output
 
 logger = getLogger(__name__)

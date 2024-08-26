@@ -7,8 +7,9 @@ from pandas import DataFrame
 from pyogrio.errors import DataSourceError
 from tqdm import tqdm
 
-from ..config import boundaries, tables
-from ..utils import get_metadata
+from src.config import boundaries, tables
+from src.utils import get_metadata
+
 from . import dates, languages
 
 logger = getLogger(__name__)

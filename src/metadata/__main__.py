@@ -5,8 +5,9 @@ from logging import getLogger
 from pandas import DataFrame
 from tqdm import tqdm
 
-from ..config import TIMEOUT, metadata_columns, tables
-from ..utils import client_get, get_iso3
+from src.config import TIMEOUT, metadata_columns, tables
+from src.utils import client_get, get_iso3
+
 from .getters import get_hdx_metadata, get_itos_metadata
 from .join import join_hdx_metadata, join_itos_metadata
 
@@ -53,11 +54,10 @@ def save_metadata(metadata: list[dict]):
     Args:
         metadata: A list of country config dicts.
     """
-    df = DataFrame(metadata)
+    df = DataFrame.from_records(metadata).convert_dtypes()
     df = df[df["hdx_url"].notna() | df["itos_url"].notna()]
     df = df[metadata_columns]
-    dest = tables / "metadata.csv"
-    df.to_csv(dest, encoding="utf-8-sig", float_format="%.0f", index=False)
+    df.to_csv(tables / "metadata.csv", index=False, encoding="utf-8-sig")
 
 
 def main():

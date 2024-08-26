@@ -8,7 +8,7 @@ from urllib.parse import urlencode
 
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from ..config import ATTEMPT, WAIT, boundaries
+from src.config import ATTEMPT, WAIT, boundaries
 
 logger = getLogger(__name__)
 

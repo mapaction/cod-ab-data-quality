@@ -1,5 +1,7 @@
 """Functions for adding properties to existing dictionaries."""
 
+from datetime import datetime as dt
+
 
 def join_hdx_metadata(row: dict, hdx: dict):
     """Adds new properties to contry config from HDX.
@@ -11,8 +13,8 @@ def join_hdx_metadata(row: dict, hdx: dict):
     Returns:
         Country config supplemented with extra properties.
     """
-    row["hdx_date"] = hdx["dataset_date"][1:11]
-    row["hdx_update"] = hdx["last_modified"][:10]
+    row["hdx_date"] = dt.fromisoformat(hdx["dataset_date"][1:11])
+    row["hdx_update"] = dt.fromisoformat(hdx["last_modified"][:10])
     row["hdx_source_1"] = hdx["dataset_source"]
     row["hdx_source_2"] = hdx["organization"]["title"]
     row["hdx_license"] = hdx["license_title"]

@@ -1,9 +1,11 @@
 """Miscellaneous utilities."""
 
 from os import getenv
+from pathlib import Path
 
+import pandas as pd
 from httpx import Client
-from pandas import read_csv
+from pandas import to_datetime
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 from .config import ATTEMPT, WAIT, args, tables
@@ -23,6 +25,27 @@ def client_get(url: str, timeout: int, params: dict | None = None):
     """
     with Client(http2=True, timeout=timeout) as client:
         return client.get(url, params=params)
+
+
+def read_csv(file_path: Path | str, datetime_to_date: bool = False):
+    """Pandas read CSV with columns converted to the best possible dtypes.
+
+    Args:
+        file_path: CSV file path to read.
+        datetime_to_date: Convert datetime to date, needed for export to Excel.
+
+    Returns:
+        Pandas DataFrame with converted dtypes.
+    """
+    df = pd.read_csv(file_path).convert_dtypes()
+    for col in df.select_dtypes(include=["string"]):
+        try:
+            df[col] = to_datetime(df[col], format="ISO8601")
+            if datetime_to_date:
+                df[col] = df[col].dt.date
+        except ValueError:
+            pass
+    return df
 
 
 def get_iso3():
@@ -47,15 +70,7 @@ def get_metadata():
         List containing the following information to download each COD: ISO-3 code,
         admin level, URL and layer index of the COD on the ArcGIS server.
     """
-    dtypes = {
-        "itos_level": "Int8",
-        "itos_index_0": "Int8",
-        "itos_index_1": "Int8",
-        "itos_index_2": "Int8",
-        "itos_index_3": "Int8",
-        "itos_index_4": "Int8",
-    }
-    df = read_csv(tables / "metadata.csv", dtype=dtypes)
+    df = read_csv(tables / "metadata.csv")
     records = df.to_dict("records")
     iso3_list = get_iso3()
     if len(iso3_list):

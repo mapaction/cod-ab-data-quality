@@ -5,7 +5,8 @@ from shutil import which
 
 from tqdm import tqdm
 
-from ..utils import get_metadata
+from src.utils import get_metadata
+
 from . import httpx, ogr2ogr
 
 logger = getLogger(__name__)
