@@ -27,9 +27,9 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
         level 0, index 1 to admin level 1, etc.
 
     Returns:
-        List of check rows to be outputed as a CSV.
+        List of results to output as a CSV.
     """
-    rows = []
+    check_results = []
     for admin_level, gdf in enumerate(gdfs):
         row = {"iso3": iso3, "level": admin_level}
         columns = list(gdf.columns)
@@ -38,5 +38,5 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
         langs = list(dict.fromkeys(langs))
         for index, lang in enumerate(langs):
             row[f"lang_{index+1}"] = lang
-        rows.append(row)
-    return rows
+        check_results.append(row)
+    return check_results

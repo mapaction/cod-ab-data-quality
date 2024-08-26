@@ -1,5 +1,5 @@
-import os
 import re
+from pathlib import Path
 
 from geopandas import GeoDataFrame, read_file
 from pytest import fixture
@@ -18,13 +18,7 @@ def get_admin_level_from_file_path(string: str) -> int:
 def gdfs() -> list[GeoDataFrame]:
     """Fixture to load test data"""
     data = []
-    shapefile_paths = [
-        os.path.join(TEST_DATA_DIR, f)
-        for f in os.listdir(TEST_DATA_DIR)
-        if f.endswith(".shp") and re.search(ADMIN_REGEX, f)
-    ]
-    shapefile_paths.sort(key=get_admin_level_from_file_path)
-    for shapefile_path in shapefile_paths:
-        gdf = read_file(shapefile_path)
-        data.append(gdf)
+    test_data_dir = Path("tests/test_data")
+    for file_path in sorted(test_data_dir.glob("*.gpkg")):
+        data.append(read_file(file_path))
     return data

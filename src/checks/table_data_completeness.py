@@ -25,7 +25,16 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
             "iso3": iso3,
             "level": admin_level,
             "total_number_of_records": gdf.size,
-            "number_of_missing_records": gdf.isin(EMPTY_VALUES).sum().sum(),
+            "number_of_missing_records": int(
+                (
+                    gdf.isna()
+                    | gdf.apply(
+                        lambda x: x.str.strip() == "" if x.dtype == "object" else False
+                    )
+                )
+                .values.sum()
+                .sum()
+            ),
         }
         check_results.append(row)
     return check_results
