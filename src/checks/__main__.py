@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from ..config import boundaries, tables
 from ..utils import get_metadata
-from . import dates, languages, table_data_completeness
+from . import dates, languages, table_data_completeness, table_data_formatting_has_data
 
 logger = getLogger(__name__)
 
@@ -37,7 +37,12 @@ def main():
     logger.info("Starting")
 
     # Register checks here
-    checks = ((dates, []), (languages, []), (table_data_completeness, []))
+    checks = (
+        (dates, []),
+        (languages, []),
+        (table_data_completeness, []),
+        (table_data_formatting_has_data, []),
+    )
 
     metadata = get_metadata()
     pbar = tqdm(metadata)
