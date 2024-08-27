@@ -2,7 +2,7 @@ import re
 
 from geopandas import GeoDataFrame
 
-from src.utils import CheckReturnList
+from src.utils import ADMIN_BOUNDARY_REGEX, CheckReturnList
 
 
 def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
@@ -21,22 +21,27 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
         row = {
             "iso3": iso3,
             "level": admin_level,
-            "has_at_least_1_data_column": table_data_formatting_has_data_cols(gdf),
+            "proportion_of_expected_heirarchical_columns": proportion_of_expected_heirarchical_columns(
+                admin_level, gdf
+            ),
         }
         check_results.append(row)
     return check_results
 
 
-def table_data_formatting_has_hierarchical_cols(shapefile_path: str) -> float:
+def proportion_of_expected_heirarchical_columns(
+    admin_level: int, gdf: GeoDataFrame
+) -> float:
     """Check completeness of an admin boundary by checking
     column relationships.
+
     Admin boundaries appear to have a hierarchical structure, where each
     file of "smaller" admin boundaries (i.e. admin4 vs admin3) has column
     names which reference the previous "larger" admin boundary. For example,
     admin4 will have columns called admin3*, admin2*, admin1* and admin0*.
 
     Args:
-        shapefile_path - a string representing the shapefile to analyse.
+        gdf - a geodataframe to analyse
 
     Returns:
         float, the proportion of expected columns in that file. e.g. if
@@ -45,22 +50,15 @@ def table_data_formatting_has_hierarchical_cols(shapefile_path: str) -> float:
         return 0.
     """
 
-    file_name = Path(shapefile_path).name
-    match = re.search(r"adm(\d)", file_name, re.IGNORECASE)
-    sf = shapefile.Reader(shapefile_path)
-    if match:
-        admin_level = int(match.group(1))
-        seen_numbers = set()
-        field_names = (field[0] for field in sf.fields)
-        # Find all the numbers in column names (e.g. '3' in ADM3_PCODE).
-        for name in field_names:
-            if match := re.match(admin_boundary_regex, name, re.IGNORECASE):
-                seen_numbers.add(int(match.group(1)))
-        number_of_matches = 0
-        # Count backwards, checking lower numbers are
-        # in col names (e.g. 2,1,0 for ADM2_*).
-        for i in range(admin_level, -1, -1):
-            if i in seen_numbers:
-                number_of_matches += 1
-        return number_of_matches / (admin_level + 1)
-    return 0
+    seen_numbers = set()
+    # Find all the numbers in column names (e.g. '3' in ADM3_PCODE).
+    for col_name in gdf.columns:
+        if match := re.match(ADMIN_BOUNDARY_REGEX, col_name, re.IGNORECASE):
+            seen_numbers.add(int(match.group(1)))
+    number_of_matches = 0
+    # Count backwards, checking lower numbers are
+    # in col names (e.g. 2,1,0 for ADM2_*).
+    for i in range(admin_level, -1, -1):
+        if i in seen_numbers:
+            number_of_matches += 1
+    return number_of_matches / (admin_level + 1)

@@ -9,7 +9,13 @@ from tqdm import tqdm
 
 from ..config import boundaries, tables
 from ..utils import get_metadata
-from . import dates, languages, table_data_completeness, table_data_formatting_has_data
+from . import (
+    dates,
+    languages,
+    table_data_completeness,
+    table_data_formatting_has_data,
+    table_data_formatting_heirarchical,
+)
 
 logger = getLogger(__name__)
 
@@ -42,6 +48,7 @@ def main():
         (languages, []),
         (table_data_completeness, []),
         (table_data_formatting_has_data, []),
+        (table_data_formatting_heirarchical, []),
     )
 
     metadata = get_metadata()

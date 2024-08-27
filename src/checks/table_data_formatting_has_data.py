@@ -2,10 +2,7 @@ import re
 
 from geopandas import GeoDataFrame
 
-from src.utils import CheckReturnList
-
-EMPTY_VALUES = (None, "null", "")
-ADMIN_BOUNDARY_REGEX = r"^[aA][dD](?:M|I|N)*(\d).*"
+from src.utils import ADMIN_BOUNDARY_REGEX, CheckReturnList
 
 
 def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:

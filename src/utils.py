@@ -13,6 +13,8 @@ from .config import ATTEMPT, WAIT, args, tables
 # Could do more with this type, as iso3 and levels keys are required.
 type CheckReturnList = list[dict[str, Any]]
 
+ADMIN_BOUNDARY_REGEX = r"^[aA][dD](?:M|I|N)*(\d).*"
+
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
 def client_get(url: str, timeout: int, params: dict | None = None):
