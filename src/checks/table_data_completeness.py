@@ -2,8 +2,6 @@ from geopandas import GeoDataFrame
 
 from src.utils import CheckReturnList
 
-EMPTY_VALUES = (None, "null", "")
-
 
 def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
     """Check completeness of an admin boundary's table data.
@@ -25,16 +23,9 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
             "iso3": iso3,
             "level": admin_level,
             "total_number_of_records": gdf.size,
-            "number_of_missing_records": int(
-                (
-                    gdf.isna()
-                    | gdf.apply(
-                        lambda x: x.str.strip() == "" if x.dtype == "object" else False
-                    )
-                )
-                .values.sum()
-                .sum()
-            ),
+            "number_of_missing_records": (
+                gdf.isna().stack() | gdf.eq("").stack() | gdf.stack().str.isspace()
+            ).sum(),
         }
         check_results.append(row)
     return check_results
