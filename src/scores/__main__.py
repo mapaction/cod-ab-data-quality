@@ -13,7 +13,7 @@ logger = getLogger(__name__)
 
 def main():
     """Main function deaft, to be updated with actual functionality."""
-    logger.info("starting")
+    logger.info("Starting")
     metadata = get_metadata()
     checks = read_csv(tables / "checks.csv")
     if checks.empty:
@@ -21,7 +21,7 @@ def main():
     pbar = tqdm(metadata)
     for row in pbar:
         pbar.set_postfix_str(row["iso3"])
-    logger.info("finished")
+    logger.info("Finished")
 
 
 if __name__ == "__main__":

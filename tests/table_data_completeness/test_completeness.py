@@ -1,43 +1,40 @@
-from pytest import approx
+from src.checks.table_data_completeness import main
 
-from src.checks.table_data_completeness import table_data_completeness
-
-
-def test_mdg_adm0_completeness():
-    table_completeness = table_data_completeness(
-        "tests/test_data/mdg_adm_bngrc_ocha_20181031_shp/"
-        "mdg_admbnda_adm0_BNGRC_OCHA_20181031.dbf"
-    )
-    assert table_completeness == 1.0
+ISO3 = "mdg"
 
 
-def test_mdg_adm1_completeness():
-    table_completeness = table_data_completeness(
-        "tests/test_data/mdg_adm_bngrc_ocha_20181031_shp/"
-        "mdg_admbnda_adm1_BNGRC_OCHA_20181031.shp"
-    )
-    assert table_completeness == 1.0
-
-
-def test_mdg_adm2_completeness():
-    table_completeness = table_data_completeness(
-        "tests/test_data/mdg_adm_bngrc_ocha_20181031_shp/"
-        "mdg_admbnda_adm2_BNGRC_OCHA_20181031.shp"
-    )
-    assert table_completeness == approx(0.92, 0.01)
-
-
-def test_mdg_adm3_completeness():
-    table_completeness = table_data_completeness(
-        "tests/test_data/mdg_adm_bngrc_ocha_20181031_shp/"
-        "mdg_admbnda_adm3_BNGRC_OCHA_20181031.shp"
-    )
-    assert table_completeness == approx(0.93, 0.01)
-
-
-def test_mdg_adm4_completeness():
-    table_completeness = table_data_completeness(
-        "tests/test_data/mdg_adm_bngrc_ocha_20181031_shp/"
-        "mdg_admbnda_adm4_BNGRC_OCHA_20181031.shp"
-    )
-    assert table_completeness == approx(0.94, 0.01)
+def test_mdg_completeness(gdfs):
+    actual = main(ISO3, gdfs)
+    expected = [
+        {
+            "iso3": "mdg",
+            "level": 0,
+            "total_number_of_records": 10,
+            "number_of_missing_records": 2,
+        },
+        {
+            "iso3": "mdg",
+            "level": 1,
+            "total_number_of_records": 352,
+            "number_of_missing_records": 44,
+        },
+        {
+            "iso3": "mdg",
+            "level": 2,
+            "total_number_of_records": 2380,
+            "number_of_missing_records": 349,
+        },
+        {
+            "iso3": "mdg",
+            "level": 3,
+            "total_number_of_records": 36317,
+            "number_of_missing_records": 4723,
+        },
+        {
+            "iso3": "mdg",
+            "level": 4,
+            "total_number_of_records": 454090,
+            "number_of_missing_records": 52150,
+        },
+    ]
+    assert actual == expected
