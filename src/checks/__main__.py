@@ -30,10 +30,10 @@ def main():
     4. When all checks have run against the ISO3's GeoDataFrames, they are released from
     memory and a new ISO3 is loaded in.
 
-    4. After all the checks have been performed for all ISO3 values, join the check
+    5. After all the checks have been performed for all ISO3 values, join the check
     tables together by ISO3 and admin level.
 
-    5. Output the final result as a single table: "data/tables/checks.csv".
+    6. Output the final result as a single table: "data/tables/checks.csv".
     """
     logger.info("Starting")
 

@@ -1,21 +1,11 @@
-fail_fast: true
 repos:
-  - repo: local
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.2
     hooks:
-      - id: ruff-lint
-        name: ruff-lint
-        entry: poetry run ruff check
-        args: [--select, I, --fix, --no-cache]
-        language: system
-        types: [file, python]
+      - id: ruff
+        args: [--fix]
       - id: ruff-format
-        name: ruff-format
-        entry: poetry run ruff format
-        args: [--no-cache]
-        language: system
-        types: [file, python]
+  - repo: https://github.com/jackdewinter/pymarkdown
+    rev: v0.9.22
+    hooks:
       - id: pymarkdown
-        name: pymarkdown
-        entry: poetry run pymarkdown scan
-        language: system
-        types: [file, markdown]

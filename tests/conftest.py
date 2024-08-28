@@ -2,11 +2,17 @@
 
 from pathlib import Path
 
+import pytest
 from geopandas import GeoDataFrame, read_file
-from pytest import fixture
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
+def iso3():
+    """Fixture to load test data."""
+    return "MDG"
+
+
+@pytest.fixture(scope="session")
 def gdfs() -> list[GeoDataFrame]:
     """Fixture to load test data."""
     data = []

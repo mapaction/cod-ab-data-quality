@@ -15,6 +15,7 @@ basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 getLogger("httpx").setLevel(WARNING)
+getLogger("numexpr.utils").setLevel(WARNING)
 getLogger("pyogrio._io").setLevel(WARNING)
 
 environ["OGR_GEOJSON_MAX_OBJ_SIZE"] = "0"
@@ -56,5 +57,3 @@ metadata_columns = [
     "hdx_source_2",
     "hdx_license",
 ]
-
-score_columns = ["iso3", "dates", "languages"]

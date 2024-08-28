@@ -1,12 +1,10 @@
 """Scoring language info."""
 
-from random import random
-
 from pandas import DataFrame
 
 
 def main(df: DataFrame):
-    """Scores languages used within dataset.
+    """Draft function for scoring languages used within dataset.
 
     Args:
         df: checks DataFrame.
@@ -14,5 +12,6 @@ def main(df: DataFrame):
     Returns:
         Checks DataFrame with additional columns for scoring.
     """
-    df["languages"] = [random() for _ in df.index]
-    return df
+    df_score = df[["iso3", "level"]].copy()
+    df_score["languages"] = df["language_count"] > 0
+    return df_score

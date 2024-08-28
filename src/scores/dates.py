@@ -1,12 +1,13 @@
 """Scoring date info."""
 
-from random import random
+from datetime import datetime
 
+from dateutil.relativedelta import relativedelta
 from pandas import DataFrame
 
 
 def main(df: DataFrame):
-    """Scores date values within dataset.
+    """Draft function for scoring date values within dataset.
 
     Args:
         df: checks DataFrame.
@@ -14,5 +15,6 @@ def main(df: DataFrame):
     Returns:
         Checks DataFrame with additional columns for scoring.
     """
-    df["dates"] = [random() for _ in df.index]
-    return df
+    df_score = df[["iso3", "level"]].copy()
+    df_score["dates"] = df["update_1"] > datetime.now() - relativedelta(years=3)
+    return df_score

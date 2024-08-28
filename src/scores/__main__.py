@@ -11,12 +11,32 @@ logger = getLogger(__name__)
 
 
 def main():
-    """Main function draft, to be updated with actual functionality."""
+    """Applies scoring to the summarized values in "checks.csv".
+
+    1. Create an iterable with each item containing the scoring function.
+
+    2. Iterate through the score functions, generating a list of new DataFrames.
+
+    3. After all the scoring has been performed, join the DataFrames together by ISO3
+    and admin level.
+
+    4. Output the final result to Excel: "data/tables/cod_ab_data_quality.xlsx".
+    """
     logger.info("Starting")
-    df = read_csv(tables / "checks.csv")
-    for check in (languages, dates):
-        df = check.main(df)
-    output.main(df)
+    df_checks = read_csv(tables / "checks.csv")
+    score_functions = (languages, dates)
+    score_results = []
+    for function in score_functions:
+        df = function.main(df_checks)
+        score_results.append(df)
+    output_table = None
+    for df in score_results:
+        if output_table is None:
+            output_table = df
+        else:
+            output_table = output_table.merge(df, on=["iso3", "level"], how="outer")
+    if output_table is not None:
+        output.main(output_table)
     logger.info("Finished")
 
 

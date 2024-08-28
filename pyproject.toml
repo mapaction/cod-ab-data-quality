@@ -27,7 +27,7 @@ build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core"]
 
 [tool.ruff.lint]
-select = ["D", "E4", "E7", "E9", "F", "ANN001", "ANN002", "ANN003", "TID252"]
+select = ["ANN0", "D", "E4", "E7", "E9", "F", "I", "PT", "TID"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
