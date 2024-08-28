@@ -22,7 +22,7 @@ def main():
     Uses OGR2OGR if available for downloading, as this is faster and more memory
     efficient. If unavailable, fall back to using HTTPX.
     """
-    logger.info("starting")
+    logger.info("Starting")
     download = ogr2ogr.download if which("ogr2ogr") else httpx.download
     metadata = []
     records = get_metadata()
@@ -37,7 +37,7 @@ def main():
         idx = row[f"itos_index_{lvl}"]
         pbar.set_postfix_str(f"{iso3}_ADM{lvl}")
         download(iso3, lvl, idx, row["itos_url"])
-    logger.info("finished")
+    logger.info("Finished")
 
 
 if __name__ == "__main__":

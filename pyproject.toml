@@ -8,7 +8,7 @@ version = "0.1.0"
 
 [tool.poetry.dependencies]
 geopandas = "^1.0.1"
-httpx = { version = "^0.27.0", extras = ["http2"] }
+httpx = { version = "^0.27.2", extras = ["http2"] }
 pandas = { version = "^2.2.2", extras = ["performance", "excel"] }
 pyarrow = "^17.0.0"
 python = "^3.12"

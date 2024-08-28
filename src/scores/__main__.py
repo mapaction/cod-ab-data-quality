@@ -12,12 +12,12 @@ logger = getLogger(__name__)
 
 def main():
     """Main function draft, to be updated with actual functionality."""
-    logger.info("starting")
+    logger.info("Starting")
     df = read_csv(tables / "checks.csv")
     for check in (languages, dates):
         df = check.main(df)
     output.main(df)
-    logger.info("finished")
+    logger.info("Finished")
 
 
 if __name__ == "__main__":

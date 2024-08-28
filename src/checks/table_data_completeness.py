@@ -1,27 +1,33 @@
-import shapefile
+"""Check for table completedness."""
 
-EMPTY_VALUES = (None, "null", "")
+from geopandas import GeoDataFrame
+
+from src.utils import CheckReturnList
 
 
-def table_data_completeness(shapefile_path: str) -> float:
-    """Check completeness of a shapefile's table data.
+def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
+    """Check completeness of an admin boundary's table data.
 
-    Iterates through a shapefile's records and checks for values that are None,
-    null or empty strings.
+    Iterates through a file's records and checks for values that are None,
+    null or empty strings. Uses vectorized pandas for speed.
 
     Args:
-        shapefile_path - a string representing the shapefile to analyse.
+        iso3: ISO3 code of the current location being checked.
+        gdfs: List of GeoDataFrames, with the item at index 0 corresponding to admin
+        level 0, index 1 to admin level 1, etc.
 
     Returns:
-         float between 0 and 1. 1 indicates complete table data (i.e. no
-         missing data). A value of 0 indicates all table data is missing.
+        List of check rows to be outputed as a CSV.
     """
-    complete_records, missing_records = 0, 0
-    sf = shapefile.Reader(shapefile_path)
-    for record in sf.iterRecords():
-        for field in record:
-            if field in EMPTY_VALUES:
-                missing_records += 1
-            else:
-                complete_records += 1
-    return complete_records / (complete_records + missing_records)
+    check_results = []
+    for admin_level, gdf in enumerate(gdfs):
+        row = {
+            "iso3": iso3,
+            "level": admin_level,
+            "total_number_of_records": gdf.size,
+            "number_of_missing_records": (
+                gdf.isna().stack() | gdf.eq("").stack() | gdf.stack().str.isspace()
+            ).sum(),
+        }
+        check_results.append(row)
+    return check_results

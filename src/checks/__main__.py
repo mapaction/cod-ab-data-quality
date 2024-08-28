@@ -10,7 +10,7 @@ from tqdm import tqdm
 from src.config import boundaries, tables
 from src.utils import get_metadata
 
-from . import dates, languages
+from . import dates, languages, table_data_completeness
 
 logger = getLogger(__name__)
 
@@ -35,9 +35,12 @@ def main():
 
     5. Output the final result as a single table: "data/tables/checks.csv".
     """
-    logger.info("starting")
+    logger.info("Starting")
+
+    # Register checks here
+    checks = ((dates, []), (languages, []), (table_data_completeness, []))
+
     metadata = get_metadata()
-    checks = ((dates, []), (languages, []))
     pbar = tqdm(metadata)
     for row in pbar:
         pbar.set_postfix_str(row["iso3"])
@@ -66,7 +69,7 @@ def main():
     if output_table is not None:
         dest = tables / "checks.csv"
         output_table.to_csv(dest, encoding="utf-8-sig", index=False)
-    logger.info("finished")
+    logger.info("Finished")
 
 
 if __name__ == "__main__":

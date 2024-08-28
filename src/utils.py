@@ -2,6 +2,7 @@
 
 from os import getenv
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 from httpx import Client
@@ -9,6 +10,9 @@ from pandas import to_datetime
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 from .config import ATTEMPT, WAIT, args, tables
+
+# TODO: Could do more with this type, as iso3 and levels keys are required.
+type CheckReturnList = list[dict[str, Any]]
 
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
