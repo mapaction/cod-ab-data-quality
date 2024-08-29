@@ -1,10 +1,8 @@
 from src.checks.table_data_formatting_heirarchical import main
 
-ISO = "mdg"
 
-
-def test_table_data_formatting_heirarchical(gdfs):
-    actual = main(ISO, gdfs)
+def test_table_data_formatting_heirarchical(iso3, gdfs):
+    actual = main(iso3, gdfs)
     expected = [
         {
             "iso3": "mdg",

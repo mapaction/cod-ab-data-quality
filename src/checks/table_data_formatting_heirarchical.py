@@ -49,7 +49,6 @@ def proportion_of_expected_heirarchical_columns(
         just admin0* column it would return 0.5. If it had neither it would
         return 0.
     """
-
     seen_numbers = set()
     # Find all the numbers in column names (e.g. '3' in ADM3_PCODE).
     for col_name in gdf.columns:

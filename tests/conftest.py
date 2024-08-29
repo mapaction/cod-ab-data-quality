@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 
 from geopandas import GeoDataFrame, read_file
@@ -6,6 +5,11 @@ from pytest import fixture
 
 ADMIN_REGEX = r"_adm(\d)_"
 TEST_DATA_DIR = "tests/test_data/mdg_adm_bngrc_ocha_20181031_shp/"
+
+
+@fixture(scope="session")
+def iso3():
+    return "mdg"
 
 
 @fixture(scope="session")

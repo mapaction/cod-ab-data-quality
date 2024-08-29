@@ -1,10 +1,8 @@
 from src.checks.table_data_completeness import main
 
-ISO3 = "mdg"
 
-
-def test_mdg_completeness(gdfs):
-    actual = main(ISO3, gdfs)
+def test_mdg_completeness(iso3, gdfs):
+    actual = main(iso3, gdfs)
     expected = [
         {
             "iso3": "mdg",
