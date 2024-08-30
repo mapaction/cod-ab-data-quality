@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 from logging import INFO, WARNING, basicConfig, getLogger
 from os import environ, getenv
 from pathlib import Path
+from typing import Any
 
 from dotenv import load_dotenv
 
@@ -56,3 +57,10 @@ metadata_columns = [
     "hdx_source_2",
     "hdx_license",
 ]
+
+
+# A return type for the checks in /checks.
+# Could do more with this type, as iso3 and levels keys are required.
+type CheckReturnList = list[dict[str, Any]]
+
+ADMIN_BOUNDARY_REGEX = r"^[aA][dD](?:M|I|N)*(\d).*"

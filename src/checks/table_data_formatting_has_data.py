@@ -2,7 +2,7 @@ import re
 
 from geopandas import GeoDataFrame
 
-from src.utils import ADMIN_BOUNDARY_REGEX, CheckReturnList
+from src.config import ADMIN_BOUNDARY_REGEX, CheckReturnList
 
 
 def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:

@@ -1,6 +1,6 @@
 from geopandas import GeoDataFrame
 
-from src.utils import CheckReturnList
+from src.config import CheckReturnList
 
 
 def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
