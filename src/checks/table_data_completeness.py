@@ -26,10 +26,11 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
             "level": admin_level,
             "total_number_of_records": gdf.size,
             "number_of_missing_records": (
-                gdf.isna().melt()
-                | gdf.eq("").melt()
-                | gdf.melt().astype(str).str.isspace()
-            ).sum(),
+                gdf.isna() | gdf.eq("") | gdf.map(lambda x: str(x).isspace())
+            )
+            .sum()
+            .sum()
+            .astype(int),
         }
         check_results.append(row)
     return check_results
