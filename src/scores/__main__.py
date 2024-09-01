@@ -23,8 +23,11 @@ def main():
     4. Output the final result to Excel: "data/tables/cod_ab_data_quality.xlsx".
     """
     logger.info("Starting")
-    df_checks = read_csv(tables_dir / "checks.csv")
+
+    # NOTE: Register scores here.
     score_functions = (languages, dates)
+
+    df_checks = read_csv(tables_dir / "checks.csv")
     score_results = []
     for function in score_functions:
         df = function.main(df_checks)

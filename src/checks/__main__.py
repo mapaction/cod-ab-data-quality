@@ -37,7 +37,7 @@ def main():
     """
     logger.info("Starting")
 
-    # Register checks here
+    # NOTE: Register checks here.
     checks = ((dates, []), (languages, []), (table_data_completeness, []))
 
     metadata = get_metadata()
