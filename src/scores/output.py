@@ -1,6 +1,6 @@
 """Creating the final Excel output of the project."""
 
-from datetime import date
+from datetime import UTC, datetime
 
 from pandas import DataFrame, ExcelWriter
 from xlsxwriter import Workbook
@@ -11,13 +11,13 @@ from src.config import tables_dir
 from src.utils import read_csv
 
 
-def format_between(format: Format, min: float, max: float):
+def format_between(cell_format: Format, min_val: float, max_val: float):
     """Returns a configuration used for conditional formatting between values in Excel.
 
     Args:
-        min: Minimum value for conditional formatting to apply to.
-        max: Maximum value for conditional formatting to apply to.
-        format: What formatting to apply when the two conditions above are true.
+        cell_format: What formatting to apply when the two conditions above are true.
+        min_val: Minimum value for conditional formatting to apply to.
+        max_val: Maximum value for conditional formatting to apply to.
 
     Returns:
         Configuration for Excel conditional formatting.
@@ -25,9 +25,9 @@ def format_between(format: Format, min: float, max: float):
     return {
         "type": "cell",
         "criteria": "between",
-        "minimum": min,
-        "maximum": max,
-        "format": format,
+        "minimum": min_val,
+        "maximum": max_val,
+        "format": cell_format,
     }
 
 
@@ -61,23 +61,22 @@ def style(last_row: int, last_col: int, workbook: Workbook, worksheet: Worksheet
     worksheet.conditional_format(first_row, first_col, last_row, last_col, between_gn)
 
 
-def aggregate(df: DataFrame):
+def aggregate(checks: DataFrame):
     """Summarize scores by averaging scores from each admin level.
 
     Args:
-        df: Resulting DataFrame created by scoring functions.
+        checks: Resulting DataFrame created by scoring functions.
 
     Returns:
         Dataframe grouped and averaged by ISO3.
     """
-    df = df.drop(columns=["level"])
-    df = df.groupby("iso3").mean()
-    df["score"] = df.mean(axis=1)
-    df = df.sort_values(by=["score"])
-    return df
+    checks = checks.drop(columns=["level"])
+    checks = checks.groupby("iso3").mean()
+    checks["score"] = checks.mean(axis=1)
+    return checks.sort_values(by=["score"])
 
 
-def main(df: DataFrame):
+def main(checks: DataFrame):
     """Aggregates scores and outputs to an Excel workbook with red/amber/green coloring.
 
     1. Groups and averages the scores generated in this module and outputs as a CSV.
@@ -89,18 +88,23 @@ def main(df: DataFrame):
     4. Adds a final sheet specifying which date the workbook was generated on.
 
     Args:
-        df: checks DataFrame.
+        checks: checks DataFrame.
     """
-    df = aggregate(df)
-    df.to_csv(tables_dir / "scores.csv", encoding="utf-8-sig")
+    scores = aggregate(checks)
+    scores.to_csv(tables_dir / "scores.csv", encoding="utf-8-sig")
     with ExcelWriter(tables_dir / "cod_ab_data_quality.xlsx") as writer:
-        df.to_excel(writer, sheet_name="scores")
+        scores.to_excel(writer, sheet_name="scores")
         if isinstance(writer.book, Workbook):
-            style(len(df.index), len(df.columns), writer.book, writer.sheets["scores"])
+            style(
+                len(scores.index),
+                len(scores.columns),
+                writer.book,
+                writer.sheets["scores"],
+            )
         for sheet in ["checks", "metadata"]:
             df1 = read_csv(tables_dir / f"{sheet}.csv", datetime_to_date=True)
             df1.to_excel(writer, sheet_name=sheet, index=False)
             writer.sheets[sheet].autofit()
-        df_date = DataFrame([{"date": date.today()}])
+        df_date = DataFrame([{"date": datetime.now(tz=UTC).date()}])
         df_date.to_excel(writer, sheet_name="date", index=False)
         writer.sheets["date"].autofit()

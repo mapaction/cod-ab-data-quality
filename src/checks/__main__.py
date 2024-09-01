@@ -59,16 +59,16 @@ def main():
         for function, results in checks:
             rows = function.main(iso3, gdfs)
             results.extend(rows)
-    output_table = None
+    output = None
     for _, results in checks:
-        df = DataFrame(results)
-        if output_table is None:
-            output_table = df
+        partial = DataFrame(results)
+        if output is None:
+            output = partial
         else:
-            output_table = output_table.merge(df, on=["iso3", "level"], how="outer")
-    if output_table is not None:
+            output = output.merge(partial, on=["iso3", "level"], how="outer")
+    if output is not None:
         dest = tables_dir / "checks.csv"
-        output_table.to_csv(dest, encoding="utf-8-sig", index=False)
+        output.to_csv(dest, encoding="utf-8-sig", index=False)
     logger.info("Finished")
 
 

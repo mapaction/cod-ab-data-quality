@@ -24,12 +24,14 @@ def main():
     """
     logger.info("Starting")
     download = ogr2ogr.download if which("ogr2ogr") else httpx.download
-    metadata = []
     records = get_metadata()
+    metadata = []
     for record in records:
-        for level in range(5):
-            if record[f"itos_index_{level}"] is not None:
-                metadata.append({**record, "admin_level": level})
+        metadata.extend(
+            {**record, "admin_level": level}
+            for level in range(5)
+            if record[f"itos_index_{level}"] is not None
+        )
     pbar = tqdm(metadata)
     for row in pbar:
         iso3 = row["iso3"]

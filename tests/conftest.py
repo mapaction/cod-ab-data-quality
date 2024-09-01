@@ -15,8 +15,6 @@ def iso3():
 @pytest.fixture(scope="session")
 def gdfs() -> list[GeoDataFrame]:
     """Fixture to load test data."""
-    data = []
     test_data_dir = Path("tests/test_data")
-    for file_path in sorted(test_data_dir.glob("*.gpkg")):
-        data.append(read_file(file_path))
-    return data
+    file_paths = sorted(test_data_dir.glob("*.gpkg"))
+    return [read_file(x) for x in file_paths]

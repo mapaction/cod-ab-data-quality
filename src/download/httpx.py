@@ -2,6 +2,7 @@
 
 from json import dump
 from logging import getLogger
+from pathlib import Path
 
 from geopandas import read_file
 from pandas import to_datetime
@@ -14,7 +15,10 @@ logger = getLogger(__name__)
 
 
 def get_layer(
-    url: str, idx: int, records: int | None = None, offset: int | None = None
+    url: str,
+    idx: int,
+    records: int | None = None,
+    offset: int | None = None,
 ):
     """Builds a URL used for retrieving ESRI JSON from an ArcGIS Feature Service.
 
@@ -93,11 +97,11 @@ def save_file(data: dict, filename: str):
         filename: File name of the output.
     """
     tmp = boundaries_dir / f"{filename}.json"
-    with open(tmp, "w") as f:
+    with Path.open(tmp, "w") as f:
         dump(data, f, separators=(",", ":"))
     gdf = read_file(tmp, use_arrow=True)
-    is_polygon = "Polygon" in gdf["geometry"].geom_type.values
-    is_multi_polygon = "MultiPolygon" in gdf["geometry"].geom_type.values
+    is_polygon = "Polygon" in gdf["geometry"].geom_type.to_numpy()
+    is_multi_polygon = "MultiPolygon" in gdf["geometry"].geom_type.to_numpy()
     if not is_polygon and not is_multi_polygon:
         raise RuntimeError(filename)
     gdf = gdf.drop(columns=["OBJECTID"], errors="ignore")
@@ -153,11 +157,10 @@ def download(iso3: str, lvl: int, idx: int, url: str):
                 esri_json = client_get(layer_url, TIMEOUT_DOWNLOAD, layer_query).json()
                 if "error" in esri_json:
                     break
+                if result is None:
+                    result = esri_json
                 else:
-                    if result is None:
-                        result = esri_json
-                    else:
-                        result["features"].extend(esri_json["features"])
+                    result["features"].extend(esri_json["features"])
             if result is not None:
                 save_file(result, filename)
                 break

@@ -37,10 +37,10 @@ def get_metadata():
         row["name"] = row["label"]["default"]
         hdx = get_hdx_metadata(row["iso3"])
         if hdx is not None:
-            row = join_hdx_metadata(row, hdx)
+            row.update(join_hdx_metadata(hdx))
         itos = get_itos_metadata(row["iso3"])
         if itos is not None:
-            row = join_itos_metadata(row, itos)
+            row.update(join_itos_metadata(itos))
     return metadata
 
 
@@ -54,10 +54,10 @@ def save_metadata(metadata: list[dict]):
     Args:
         metadata: A list of country config dicts.
     """
-    df = DataFrame.from_records(metadata).convert_dtypes()
-    df = df[df["hdx_url"].notna() | df["itos_url"].notna()]
-    df = df[metadata_columns]
-    df.to_csv(tables_dir / "metadata.csv", index=False, encoding="utf-8-sig")
+    output = DataFrame.from_records(metadata).convert_dtypes()
+    output = output[output["hdx_url"].notna() | output["itos_url"].notna()]
+    output = output[metadata_columns]
+    output.to_csv(tables_dir / "metadata.csv", index=False, encoding="utf-8-sig")
 
 
 def main():

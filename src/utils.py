@@ -11,7 +11,7 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 
 from .config import ATTEMPT, WAIT, args, tables_dir
 
-# TODO: Could do more with this type, as iso3 and levels keys are required.
+# NOTE: Could do more with this type, as iso3 and levels keys are required.
 type CheckReturnList = list[dict[str, Any]]
 
 
@@ -31,7 +31,7 @@ def client_get(url: str, timeout: int, params: dict | None = None):
         return client.get(url, params=params)
 
 
-def read_csv(file_path: Path | str, datetime_to_date: bool = False):
+def read_csv(file_path: Path | str, *, datetime_to_date: bool = False):
     """Pandas read CSV with columns converted to the best possible dtypes.
 
     Args:
@@ -41,15 +41,15 @@ def read_csv(file_path: Path | str, datetime_to_date: bool = False):
     Returns:
         Pandas DataFrame with converted dtypes.
     """
-    df = pd.read_csv(file_path).convert_dtypes()
-    for col in df.select_dtypes(include=["string"]):
+    df_csv = pd.read_csv(file_path).convert_dtypes()
+    for col in df_csv.select_dtypes(include=["string"]):
         try:
-            df[col] = to_datetime(df[col], format="ISO8601")
+            df_csv[col] = to_datetime(df_csv[col], format="ISO8601")
             if datetime_to_date:
-                df[col] = df[col].dt.date
+                df_csv[col] = df_csv[col].dt.date
         except ValueError:
             pass
-    return df
+    return df_csv
 
 
 def get_iso3():
@@ -61,8 +61,7 @@ def get_iso3():
     iso3_list = getenv("ISO3", "").split(",")
     if args.iso3:
         iso3_list = args.iso3.split(",")
-    iso3_list_cleaned = [x.strip().upper() for x in iso3_list if x.strip() != ""]
-    return iso3_list_cleaned
+    return [x.strip().upper() for x in iso3_list if x.strip() != ""]
 
 
 def get_metadata():
@@ -74,8 +73,8 @@ def get_metadata():
         List containing the following information to download each COD: ISO-3 code,
         admin level, URL and layer index of the COD on the ArcGIS server.
     """
-    df = read_csv(tables_dir / "metadata.csv")
-    records = df.to_dict("records")
+    metadata = read_csv(tables_dir / "metadata.csv")
+    records = metadata.to_dict("records")
     iso3_list = get_iso3()
     if len(iso3_list):
         records = [x for x in records if x["iso3"] in iso3_list]

@@ -60,6 +60,7 @@ def ogr2ogr(idx: int, url: str, filename: str, records: int | None):
             *[dst_dataset, src_dataset],
         ],
         stderr=DEVNULL,
+        check=False,
     )
 
 
@@ -76,7 +77,7 @@ def is_polygon(file: Path):
         True if the file is detected as a valid polygon, otherwise false.
     """
     regex = compile(r"\((Multi Polygon|Polygon)\)")
-    result = run(["ogrinfo", file], capture_output=True)
+    result = run(["ogrinfo", file], capture_output=True, check=False)
     return bool(regex.search(result.stdout.decode("utf-8")))
 
 

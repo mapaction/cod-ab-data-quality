@@ -23,7 +23,8 @@ environ["OGR_ORGANIZE_POLYGONS"] = "ONLY_CCW"
 
 parser = ArgumentParser()
 parser.add_argument(
-    "--iso3", help="Comma separated list of ISO3 codes used by commands."
+    "--iso3",
+    help="Comma separated list of ISO3 codes used by commands.",
 )
 args = parser.parse_args()
 

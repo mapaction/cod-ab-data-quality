@@ -30,14 +30,18 @@ def main():
     df_checks = read_csv(tables_dir / "checks.csv")
     score_results = []
     for function in score_functions:
-        df = function.main(df_checks)
-        score_results.append(df)
+        partial = function.main(df_checks)
+        score_results.append(partial)
     output_table = None
-    for df in score_results:
+    for partial in score_results:
         if output_table is None:
-            output_table = df
+            output_table = partial
         else:
-            output_table = output_table.merge(df, on=["iso3", "level"], how="outer")
+            output_table = output_table.merge(
+                partial,
+                on=["iso3", "level"],
+                how="outer",
+            )
     if output_table is not None:
         output.main(output_table)
     logger.info("Finished")
