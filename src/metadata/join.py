@@ -1,6 +1,6 @@
 """Functions for adding properties to existing dictionaries."""
 
-from datetime import datetime
+from pandas import Timestamp
 
 
 def join_hdx_metadata(hdx: dict):
@@ -13,8 +13,8 @@ def join_hdx_metadata(hdx: dict):
         Country config supplemented with extra properties.
     """
     return {
-        "hdx_date": datetime.fromisoformat(hdx["dataset_date"][1:11]),
-        "hdx_update": datetime.fromisoformat(hdx["last_modified"][:10]),
+        "hdx_date": Timestamp(hdx["dataset_date"][1:11]),
+        "hdx_update": Timestamp(hdx["last_modified"][:10]),
         "hdx_source_1": hdx["dataset_source"],
         "hdx_source_2": hdx["organization"]["title"],
         "hdx_license": hdx["license_title"],
