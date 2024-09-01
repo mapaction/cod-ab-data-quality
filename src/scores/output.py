@@ -1,8 +1,6 @@
 """Creating the final Excel output of the project."""
 
-from datetime import UTC, datetime
-
-from pandas import DataFrame, ExcelWriter
+from pandas import DataFrame, ExcelWriter, Timestamp
 from xlsxwriter import Workbook
 from xlsxwriter.format import Format
 from xlsxwriter.worksheet import Worksheet
@@ -105,6 +103,6 @@ def main(checks: DataFrame):
             df1 = read_csv(tables_dir / f"{sheet}.csv", datetime_to_date=True)
             df1.to_excel(writer, sheet_name=sheet, index=False)
             writer.sheets[sheet].autofit()
-        df_date = DataFrame([{"date": datetime.now(tz=UTC).date()}])
+        df_date = DataFrame([{"date": Timestamp.now().date()}])
         df_date.to_excel(writer, sheet_name="date", index=False)
         writer.sheets["date"].autofit()
