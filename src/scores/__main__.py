@@ -2,7 +2,7 @@
 
 from logging import getLogger
 
-from src.config import tables
+from src.config import tables_dir
 from src.utils import read_csv
 
 from . import dates, languages, output
@@ -23,7 +23,7 @@ def main():
     4. Output the final result to Excel: "data/tables/cod_ab_data_quality.xlsx".
     """
     logger.info("Starting")
-    df_checks = read_csv(tables / "checks.csv")
+    df_checks = read_csv(tables_dir / "checks.csv")
     score_functions = (languages, dates)
     score_results = []
     for function in score_functions:

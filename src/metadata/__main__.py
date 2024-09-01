@@ -5,7 +5,7 @@ from logging import getLogger
 from pandas import DataFrame
 from tqdm import tqdm
 
-from src.config import TIMEOUT, metadata_columns, tables
+from src.config import TIMEOUT, metadata_columns, tables_dir
 from src.utils import client_get, get_iso3
 
 from .getters import get_hdx_metadata, get_itos_metadata
@@ -57,7 +57,7 @@ def save_metadata(metadata: list[dict]):
     df = DataFrame.from_records(metadata).convert_dtypes()
     df = df[df["hdx_url"].notna() | df["itos_url"].notna()]
     df = df[metadata_columns]
-    df.to_csv(tables / "metadata.csv", index=False, encoding="utf-8-sig")
+    df.to_csv(tables_dir / "metadata.csv", index=False, encoding="utf-8-sig")
 
 
 def main():

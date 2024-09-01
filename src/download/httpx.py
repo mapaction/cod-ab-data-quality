@@ -7,7 +7,7 @@ from geopandas import read_file
 from pandas import to_datetime
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from src.config import ATTEMPT, TIMEOUT, TIMEOUT_DOWNLOAD, WAIT, boundaries
+from src.config import ATTEMPT, TIMEOUT, TIMEOUT_DOWNLOAD, WAIT, boundaries_dir
 from src.utils import client_get
 
 logger = getLogger(__name__)
@@ -92,7 +92,7 @@ def save_file(data: dict, filename: str):
         data: ESRI JSON represented as a dict.
         filename: File name of the output.
     """
-    tmp = boundaries / f"{filename}.json"
+    tmp = boundaries_dir / f"{filename}.json"
     with open(tmp, "w") as f:
         dump(data, f, separators=(",", ":"))
     gdf = read_file(tmp, use_arrow=True)
@@ -103,7 +103,7 @@ def save_file(data: dict, filename: str):
     gdf = gdf.drop(columns=["OBJECTID"], errors="ignore")
     for col in gdf.select_dtypes(include=["datetime"]):
         gdf[col] = to_datetime(gdf[col], utc=True)
-    gdf.to_file(boundaries / f"{filename}.gpkg")
+    gdf.to_file(boundaries_dir / f"{filename}.gpkg")
     tmp.unlink(missing_ok=True)
 
 
@@ -161,5 +161,5 @@ def download(iso3: str, lvl: int, idx: int, url: str):
             if result is not None:
                 save_file(result, filename)
                 break
-    if not (boundaries / f"{filename}.gpkg").is_file():
+    if not (boundaries_dir / f"{filename}.gpkg").is_file():
         raise RuntimeError(filename)

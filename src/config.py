@@ -33,10 +33,10 @@ TIMEOUT = int(getenv("TIMEOUT", "60"))
 TIMEOUT_DOWNLOAD = int(getenv("TIMEOUT_DOWNLOAD", "600"))
 
 cwd = Path(__file__).parent
-tables = cwd / "../data/tables"
-tables.mkdir(parents=True, exist_ok=True)
-boundaries = cwd / "../data/boundaries"
-boundaries.mkdir(parents=True, exist_ok=True)
+tables_dir = cwd / "../data/tables"
+tables_dir.mkdir(parents=True, exist_ok=True)
+boundaries_dir = cwd / "../data/boundaries"
+boundaries_dir.mkdir(parents=True, exist_ok=True)
 
 metadata_columns = [
     "iso3",

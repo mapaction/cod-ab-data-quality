@@ -9,7 +9,7 @@ from httpx import Client
 from pandas import to_datetime
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from .config import ATTEMPT, WAIT, args, tables
+from .config import ATTEMPT, WAIT, args, tables_dir
 
 # TODO: Could do more with this type, as iso3 and levels keys are required.
 type CheckReturnList = list[dict[str, Any]]
@@ -74,7 +74,7 @@ def get_metadata():
         List containing the following information to download each COD: ISO-3 code,
         admin level, URL and layer index of the COD on the ArcGIS server.
     """
-    df = read_csv(tables / "metadata.csv")
+    df = read_csv(tables_dir / "metadata.csv")
     records = df.to_dict("records")
     iso3_list = get_iso3()
     if len(iso3_list):

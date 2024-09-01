@@ -7,7 +7,7 @@ from xlsxwriter import Workbook
 from xlsxwriter.format import Format
 from xlsxwriter.worksheet import Worksheet
 
-from src.config import tables
+from src.config import tables_dir
 from src.utils import read_csv
 
 
@@ -92,13 +92,13 @@ def main(df: DataFrame):
         df: checks DataFrame.
     """
     df = aggregate(df)
-    df.to_csv(tables / "scores.csv", encoding="utf-8-sig")
-    with ExcelWriter(tables / "cod_ab_data_quality.xlsx") as writer:
+    df.to_csv(tables_dir / "scores.csv", encoding="utf-8-sig")
+    with ExcelWriter(tables_dir / "cod_ab_data_quality.xlsx") as writer:
         df.to_excel(writer, sheet_name="scores")
         if isinstance(writer.book, Workbook):
             style(len(df.index), len(df.columns), writer.book, writer.sheets["scores"])
         for sheet in ["checks", "metadata"]:
-            df1 = read_csv(tables / f"{sheet}.csv", datetime_to_date=True)
+            df1 = read_csv(tables_dir / f"{sheet}.csv", datetime_to_date=True)
             df1.to_excel(writer, sheet_name=sheet, index=False)
             writer.sheets[sheet].autofit()
         df_date = DataFrame([{"date": date.today()}])

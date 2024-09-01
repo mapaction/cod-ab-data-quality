@@ -7,7 +7,7 @@ from pandas import DataFrame
 from pyogrio.errors import DataSourceError
 from tqdm import tqdm
 
-from src.config import boundaries, tables
+from src.config import boundaries_dir, tables_dir
 from src.utils import get_metadata
 
 from . import dates, languages, table_data_completeness
@@ -50,7 +50,7 @@ def main():
             levels = -1
         gdfs = []
         for level in range(levels + 1):
-            file = boundaries / f"{iso3.lower()}_adm{level}.gpkg"
+            file = boundaries_dir / f"{iso3.lower()}_adm{level}.gpkg"
             try:
                 gdf = read_file(file, use_arrow=True)
             except DataSourceError:
@@ -67,7 +67,7 @@ def main():
         else:
             output_table = output_table.merge(df, on=["iso3", "level"], how="outer")
     if output_table is not None:
-        dest = tables / "checks.csv"
+        dest = tables_dir / "checks.csv"
         output_table.to_csv(dest, encoding="utf-8-sig", index=False)
     logger.info("Finished")
 
