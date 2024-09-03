@@ -20,7 +20,7 @@ tqdm = "^4.66.5"
 pre-commit = "^3.8.0"
 pymarkdownlnt = "^0.9.22"
 pytest = "^8.3.2"
-ruff = "^0.6.2"
+ruff = "^0.6.3"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
