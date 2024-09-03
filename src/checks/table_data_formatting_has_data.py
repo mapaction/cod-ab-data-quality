@@ -21,22 +21,9 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
         row = {
             "iso3": iso3,
             "level": admin_level,
-            "has_at_least_1_data_column": table_data_formatting_has_data_cols(gdf),
+            "has_any_data_columns": any(
+                re.match(ADMIN_BOUNDARY_REGEX, column) for column in gdf.columns
+            ),
         }
         check_results.append(row)
     return check_results
-
-
-def table_data_formatting_has_data_cols(gdf: GeoDataFrame) -> float:
-    """Check completeness of an admin boundary by checking the columns.
-
-    Args:
-        gdf - a Geopandas geodataframe representing a COD admin boundary
-
-    Returns:
-         1 if _any_ columns match the regex. 0 otherwise.
-    """
-    for column in gdf.columns:
-        if re.match(ADMIN_BOUNDARY_REGEX, column, re.IGNORECASE):
-            return True
-    return False
