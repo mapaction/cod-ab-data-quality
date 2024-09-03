@@ -1,5 +1,3 @@
-"""Main entry point for the script."""
-
 from logging import getLogger
 
 from src.config import tables_dir
@@ -10,7 +8,7 @@ from . import dates, languages, output
 logger = getLogger(__name__)
 
 
-def main():
+def main() -> None:
     """Applies scoring to the summarized values in "checks.csv".
 
     1. Create an iterable with each item containing the scoring function.

@@ -1,10 +1,8 @@
-"""Scoring date info."""
-
 from dateutil.relativedelta import relativedelta
 from pandas import DataFrame, Timestamp
 
 
-def main(df: DataFrame):
+def main(df: DataFrame) -> DataFrame:
     """Draft function for scoring date values within dataset.
 
     Args:

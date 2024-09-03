@@ -1,9 +1,8 @@
-"""Project configuration."""
-
 from argparse import ArgumentParser
 from logging import INFO, WARNING, basicConfig, getLogger
 from os import environ, getenv
 from pathlib import Path
+from typing import Any
 
 from dotenv import load_dotenv
 
@@ -32,6 +31,9 @@ ATTEMPT = int(getenv("ATTEMPT", "5"))
 WAIT = int(getenv("WAIT", "10"))
 TIMEOUT = int(getenv("TIMEOUT", "60"))
 TIMEOUT_DOWNLOAD = int(getenv("TIMEOUT_DOWNLOAD", "600"))
+
+# NOTE: Could do more with this type, as iso3 and levels keys are required.
+type CheckReturnList = list[dict[str, Any]]
 
 cwd = Path(__file__).parent
 tables_dir = cwd / "../data/tables"

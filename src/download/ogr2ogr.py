@@ -1,9 +1,7 @@
-"""Download functions using GDAL, runs faster than HTTPX."""
-
 from logging import getLogger
 from pathlib import Path
 from re import compile
-from subprocess import DEVNULL, run
+from subprocess import DEVNULL, CompletedProcess, run
 from urllib.parse import urlencode
 
 from tenacity import retry, stop_after_attempt, wait_fixed
@@ -13,7 +11,12 @@ from src.config import ATTEMPT, WAIT, boundaries_dir
 logger = getLogger(__name__)
 
 
-def ogr2ogr(idx: int, url: str, filename: str, records: int | None):
+def ogr2ogr(
+    idx: int,
+    url: str,
+    filename: str,
+    records: int | None,
+) -> CompletedProcess[bytes]:
     """Uses OGR2OGR to download ESRI JSON from an ArcGIS server to local GeoPackage.
 
     The query parameter "f" (format) is set to return JSON (default is HTML), "where" is
@@ -64,7 +67,7 @@ def ogr2ogr(idx: int, url: str, filename: str, records: int | None):
     )
 
 
-def is_polygon(file: Path):
+def is_polygon(file: Path) -> bool:
     """Uses OGR to check whether a downloaded file is a valid polygon.
 
     During the download process, the ArcGIS server may return empty geometry. This check
@@ -82,7 +85,7 @@ def is_polygon(file: Path):
 
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
-def download(iso3: str, lvl: int, idx: int, url: str):
+def download(iso3: str, lvl: int, idx: int, url: str) -> None:
     """Downloads ESRI JSON from an ArcGIS Feature Server and saves as GeoPackage.
 
     First, attempts to download ESRI JSON paginating through the layer with the value

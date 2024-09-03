@@ -1,5 +1,3 @@
-"""Creating the final Excel output of the project."""
-
 from pandas import DataFrame, ExcelWriter, Timestamp
 from xlsxwriter import Workbook
 from xlsxwriter.format import Format
@@ -9,7 +7,11 @@ from src.config import tables_dir
 from src.utils import read_csv
 
 
-def format_between(cell_format: Format, min_val: float, max_val: float):
+def format_between(
+    cell_format: Format,
+    min_val: float,
+    max_val: float,
+) -> dict[str, str | float | Format]:
     """Returns a configuration used for conditional formatting between values in Excel.
 
     Args:
@@ -29,7 +31,12 @@ def format_between(cell_format: Format, min_val: float, max_val: float):
     }
 
 
-def style(last_row: int, last_col: int, workbook: Workbook, worksheet: Worksheet):
+def style(
+    last_row: int,
+    last_col: int,
+    workbook: Workbook,
+    worksheet: Worksheet,
+) -> None:
     """Apply red / amber / green styling to excel values that fall between value ranges.
 
     - Decimals are formatted as percentages.
@@ -59,7 +66,7 @@ def style(last_row: int, last_col: int, workbook: Workbook, worksheet: Worksheet
     worksheet.conditional_format(first_row, first_col, last_row, last_col, between_gn)
 
 
-def aggregate(checks: DataFrame):
+def aggregate(checks: DataFrame) -> DataFrame:
     """Summarize scores by averaging scores from each admin level.
 
     Args:
@@ -74,7 +81,7 @@ def aggregate(checks: DataFrame):
     return checks.sort_values(by=["score"])
 
 
-def main(checks: DataFrame):
+def main(checks: DataFrame) -> None:
     """Aggregates scores and outputs to an Excel workbook with red/amber/green coloring.
 
     1. Groups and averages the scores generated in this module and outputs as a CSV.

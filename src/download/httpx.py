@@ -1,8 +1,7 @@
-"""Download functions using HTTPX, avoiding GDAL install."""
-
 from json import dump
 from logging import getLogger
 from pathlib import Path
+from typing import Any
 
 from geopandas import read_file
 from pandas import to_datetime
@@ -19,7 +18,7 @@ def get_layer(
     idx: int,
     records: int | None = None,
     offset: int | None = None,
-):
+) -> tuple[str, dict[str, Any]]:
     """Builds a URL used for retrieving ESRI JSON from an ArcGIS Feature Service.
 
     The query parameter "f" (format) is set to return JSON (default is HTML), "where" is
@@ -54,7 +53,7 @@ def get_layer(
     return f"{url}/{idx}/query", query
 
 
-def get_layer_count(url: str, idx: int):
+def get_layer_count(url: str, idx: int) -> tuple[str, dict[str, Any]]:
     """Gets a URL containing the total number of features in a layer.
 
     The query parameter "f" (format) is set to return JSON (default is HTML), "where" is
@@ -78,7 +77,7 @@ def get_layer_count(url: str, idx: int):
     return f"{url}/{idx}/query", query
 
 
-def save_file(data: dict, filename: str):
+def save_file(data: dict, filename: str) -> None:
     """Saves ESRI JSON data as a GeoPackage, normalizing attributes.
 
     First, temporarily saves an ESRI JSON file to disk to free up memory.
@@ -112,7 +111,7 @@ def save_file(data: dict, filename: str):
 
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
-def download(iso3: str, lvl: int, idx: int, url: str):
+def download(iso3: str, lvl: int, idx: int, url: str) -> None:
     """Downloads ESRI JSON from an ArcGIS Feature Server and saves as GeoPackage.
 
     First, attempts to download ESRI JSON in a single request. This request may fail due

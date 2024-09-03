@@ -1,13 +1,12 @@
-"""Test configuration file."""
-
 from pathlib import Path
+from typing import Literal
 
 import pytest
 from geopandas import GeoDataFrame, read_file
 
 
 @pytest.fixture(scope="session")
-def iso3():
+def iso3() -> Literal["MDG"]:
     """Fixture to load test data."""
     return "MDG"
 

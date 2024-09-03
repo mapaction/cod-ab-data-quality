@@ -1,9 +1,9 @@
-"""Functions for adding properties to existing dictionaries."""
+from typing import Any
 
 from pandas import Timestamp
 
 
-def join_hdx_metadata(hdx: dict):
+def join_hdx_metadata(hdx: dict) -> dict[str, Any]:
     """Returns new properties for contry config from HDX.
 
     Args:
@@ -22,7 +22,7 @@ def join_hdx_metadata(hdx: dict):
     }
 
 
-def join_itos_metadata(itos: dict):
+def join_itos_metadata(itos: dict) -> dict[str, Any]:
     """Returns new properties for contry config from ITOS.
 
     Args:

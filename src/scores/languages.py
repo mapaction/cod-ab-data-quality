@@ -1,9 +1,7 @@
-"""Scoring language info."""
-
 from pandas import DataFrame
 
 
-def main(df: DataFrame):
+def main(df: DataFrame) -> DataFrame:
     """Draft function for scoring languages used within dataset.
 
     Args:

@@ -1,12 +1,11 @@
-"""Utility functions for getting various data."""
-
 from re import compile
+from typing import Any, Literal
 
 from src.config import TIMEOUT
 from src.utils import client_get
 
 
-def get_hdx_metadata(iso3: str):
+def get_hdx_metadata(iso3: str) -> dict[str, Any]:
     """Get HDX metadata associated with a COD on HDX.
 
     This is useful for accessing information such as what license does this data fall
@@ -25,7 +24,7 @@ def get_hdx_metadata(iso3: str):
     return result
 
 
-def get_service_url(directory: str, iso3: str):
+def get_service_url(directory: str, iso3: str) -> str:
     """Gets the URL of a COD's ArcGIS Feature Service from ITOS.
 
     Args:
@@ -39,7 +38,9 @@ def get_service_url(directory: str, iso3: str):
     return f"{base}/{directory}/{iso3}_pcode/FeatureServer"
 
 
-def get_service(iso3: str):
+def get_service(
+    iso3: str,
+) -> tuple[Any | None, Literal["COD_NO_GEOM_CHECK", "COD_External"], str]:
     """Gets key metadata about a COD from the ITOS ArcGIS server.
 
     Args:
@@ -62,7 +63,7 @@ def get_service(iso3: str):
     return service["layers"], directory, url.split("?")[0]
 
 
-def get_layer_indexes(layers: list[dict]):
+def get_layer_indexes(layers: list[dict[str, Any]]) -> dict[str, Any]:
     """A list of layer indexes containing admin polygons for the COD's Feature Service.
 
     The Feature Service for a COD will contain many layers identified by their index
@@ -89,7 +90,7 @@ def get_layer_indexes(layers: list[dict]):
     return indexes
 
 
-def get_itos_metadata(iso3: str):
+def get_itos_metadata(iso3: str) -> dict[str, Any] | None:
     """Gets COD metadata from the ITOS ArcGIS server if it exists there.
 
     Args:

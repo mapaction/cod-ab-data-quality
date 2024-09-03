@@ -1,17 +1,9 @@
-"""Test for table completedness."""
-
 from geopandas import GeoDataFrame
 
 from src.checks.table_data_completeness import main
 
 
-def test_mdg_completeness(iso3: str, gdfs: list[GeoDataFrame]):
-    """Test for table completedness.
-
-    Args:
-        iso3: ISO3 code of the current location being checked.
-        gdfs: List of GeoDataFrames.
-    """
+def test_mdg_completeness(iso3: str, gdfs: list[GeoDataFrame]) -> None:
     actual = main(iso3, gdfs)
     expected = [
         {

@@ -1,22 +1,18 @@
-"""Miscellaneous utilities."""
-
+from collections.abc import Hashable
 from os import getenv
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from httpx import Client
-from pandas import to_datetime
+from httpx import Client, Response
+from pandas import DataFrame, to_datetime
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 from .config import ATTEMPT, WAIT, args, tables_dir
 
-# NOTE: Could do more with this type, as iso3 and levels keys are required.
-type CheckReturnList = list[dict[str, Any]]
-
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
-def client_get(url: str, timeout: int, params: dict | None = None):
+def client_get(url: str, timeout: int, params: dict | None = None) -> Response:
     """HTTP GET with retries, waiting, and longer timeouts.
 
     Args:
@@ -31,7 +27,7 @@ def client_get(url: str, timeout: int, params: dict | None = None):
         return client.get(url, params=params)
 
 
-def read_csv(file_path: Path | str, *, datetime_to_date: bool = False):
+def read_csv(file_path: Path | str, *, datetime_to_date: bool = False) -> DataFrame:
     """Pandas read CSV with columns converted to the best possible dtypes.
 
     Args:
@@ -52,7 +48,7 @@ def read_csv(file_path: Path | str, *, datetime_to_date: bool = False):
     return df_csv
 
 
-def get_iso3():
+def get_iso3() -> list[str]:
     """Gets a list of ISO-3 values from an environment variable or argparser.
 
     Returns:
@@ -64,7 +60,7 @@ def get_iso3():
     return [x.strip().upper() for x in iso3_list if x.strip() != ""]
 
 
-def get_metadata():
+def get_metadata() -> list[dict[Hashable, Any]]:
     """Load the metadata table and create a list with every COD admin layer to download.
 
     For example, returns entries for AFG_ADM0, AFG_ADM1, AFG_ADM2, AGO_ADM0, etc.

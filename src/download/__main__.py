@@ -1,5 +1,3 @@
-"""Main entry point for the script."""
-
 from logging import getLogger
 from shutil import which
 
@@ -12,7 +10,7 @@ from . import httpx, ogr2ogr
 logger = getLogger(__name__)
 
 
-def main():
+def main() -> None:
     """Downloads all available COD boundary data from ITOS ArcGIS server.
 
     Uses the metadata.csv sheet generated with a separate module to iterate through each

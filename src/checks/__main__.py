@@ -1,5 +1,3 @@
-"""Main entry point for the script."""
-
 from logging import getLogger
 
 from geopandas import GeoDataFrame, read_file
@@ -15,7 +13,7 @@ from . import dates, languages, table_data_completeness
 logger = getLogger(__name__)
 
 
-def main():
+def main() -> None:
     """Summarizes and describes the data contained within downloaded boundaries.
 
     1. Create an iterable with each item containing the following (check_function,

@@ -1,8 +1,6 @@
-"""Check for table completedness."""
-
 from geopandas import GeoDataFrame
 
-from src.utils import CheckReturnList
+from src.config import CheckReturnList
 
 
 def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
@@ -25,12 +23,11 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
             "iso3": iso3,
             "level": admin_level,
             "total_number_of_records": gdf.size,
-            "number_of_missing_records": (
-                gdf.isna() | gdf.eq("") | gdf.map(lambda x: str(x).isspace())
-            )
-            .sum()
-            .sum()
-            .astype(int),
+            "number_of_missing_records": int(
+                (gdf.isna() | gdf.eq("") | gdf.map(lambda x: str(x).isspace()))
+                .sum()
+                .sum(),
+            ),
         }
         check_results.append(row)
     return check_results
