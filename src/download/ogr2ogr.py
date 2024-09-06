@@ -1,19 +1,22 @@
-"""Download functions using GDAL, runs faster than HTTPX."""
-
 from logging import getLogger
 from pathlib import Path
 from re import compile
-from subprocess import DEVNULL, run
+from subprocess import DEVNULL, CompletedProcess, run
 from urllib.parse import urlencode
 
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from ..config import ATTEMPT, WAIT, boundaries
+from src.config import ATTEMPT, WAIT, boundaries_dir
 
 logger = getLogger(__name__)
 
 
-def ogr2ogr(idx: int, url: str, filename: str, records: int | None):
+def ogr2ogr(
+    idx: int,
+    url: str,
+    filename: str,
+    records: int | None,
+) -> CompletedProcess[bytes]:
     """Uses OGR2OGR to download ESRI JSON from an ArcGIS server to local GeoPackage.
 
     The query parameter "f" (format) is set to return JSON (default is HTML), "where" is
@@ -49,7 +52,7 @@ def ogr2ogr(idx: int, url: str, filename: str, records: int | None):
     }
     if records is not None:
         query["resultRecordCount"] = records
-    dst_dataset = boundaries / f"{filename}.gpkg"
+    dst_dataset = boundaries_dir / f"{filename}.gpkg"
     src_dataset = f"{url}/{idx}/query?{urlencode(query)}"
     return run(
         [
@@ -60,10 +63,11 @@ def ogr2ogr(idx: int, url: str, filename: str, records: int | None):
             *[dst_dataset, src_dataset],
         ],
         stderr=DEVNULL,
+        check=False,
     )
 
 
-def is_polygon(file: Path):
+def is_polygon(file: Path) -> bool:
     """Uses OGR to check whether a downloaded file is a valid polygon.
 
     During the download process, the ArcGIS server may return empty geometry. This check
@@ -76,12 +80,12 @@ def is_polygon(file: Path):
         True if the file is detected as a valid polygon, otherwise false.
     """
     regex = compile(r"\((Multi Polygon|Polygon)\)")
-    result = run(["ogrinfo", file], capture_output=True)
+    result = run(["ogrinfo", file], capture_output=True, check=False)
     return bool(regex.search(result.stdout.decode("utf-8")))
 
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
-def download(iso3: str, lvl: int, idx: int, url: str):
+def download(iso3: str, lvl: int, idx: int, url: str) -> None:
     """Downloads ESRI JSON from an ArcGIS Feature Server and saves as GeoPackage.
 
     First, attempts to download ESRI JSON paginating through the layer with the value
@@ -113,5 +117,5 @@ def download(iso3: str, lvl: int, idx: int, url: str):
         result = ogr2ogr(idx, url, filename, records)
         if result.returncode == 0:
             break
-    if not is_polygon(boundaries / f"{filename}.gpkg"):
+    if not is_polygon(boundaries_dir / f"{filename}.gpkg"):
         raise RuntimeError(filename)

@@ -1,5 +1,3 @@
-"""Main entry point for the script."""
-
 from logging import getLogger
 
 from geopandas import GeoDataFrame, read_file
@@ -7,14 +5,15 @@ from pandas import DataFrame
 from pyogrio.errors import DataSourceError
 from tqdm import tqdm
 
-from ..config import boundaries, tables
-from ..utils import get_metadata
+from src.config import boundaries_dir, tables_dir
+from src.utils import get_metadata
+
 from . import dates, languages, table_data_completeness
 
 logger = getLogger(__name__)
 
 
-def main():
+def main() -> None:
     """Summarizes and describes the data contained within downloaded boundaries.
 
     1. Create an iterable with each item containing the following (check_function,
@@ -29,14 +28,14 @@ def main():
     4. When all checks have run against the ISO3's GeoDataFrames, they are released from
     memory and a new ISO3 is loaded in.
 
-    4. After all the checks have been performed for all ISO3 values, join the check
+    5. After all the checks have been performed for all ISO3 values, join the check
     tables together by ISO3 and admin level.
 
-    5. Output the final result as a single table: "data/tables/checks.csv".
+    6. Output the final result as a single table: "data/tables/checks.csv".
     """
     logger.info("Starting")
 
-    # Register checks here
+    # NOTE: Register checks here.
     checks = ((dates, []), (languages, []), (table_data_completeness, []))
 
     metadata = get_metadata()
@@ -49,7 +48,7 @@ def main():
             levels = -1
         gdfs = []
         for level in range(levels + 1):
-            file = boundaries / f"{iso3.lower()}_adm{level}.gpkg"
+            file = boundaries_dir / f"{iso3.lower()}_adm{level}.gpkg"
             try:
                 gdf = read_file(file, use_arrow=True)
             except DataSourceError:
@@ -58,16 +57,16 @@ def main():
         for function, results in checks:
             rows = function.main(iso3, gdfs)
             results.extend(rows)
-    output_table = None
+    output = None
     for _, results in checks:
-        df = DataFrame(results)
-        if output_table is None:
-            output_table = df
+        partial = DataFrame(results)
+        if output is None:
+            output = partial
         else:
-            output_table = output_table.merge(df, on=["iso3", "level"], how="outer")
-    if output_table is not None:
-        dest = tables / "checks.csv"
-        output_table.to_csv(dest, encoding="utf-8-sig", index=False)
+            output = output.merge(partial, on=["iso3", "level"], how="outer")
+    if output is not None:
+        dest = tables_dir / "checks.csv"
+        output.to_csv(dest, encoding="utf-8-sig", index=False)
     logger.info("Finished")
 
 

@@ -1,17 +1,16 @@
-"""Main entry point for the script."""
-
 from logging import getLogger
 from shutil import which
 
 from tqdm import tqdm
 
-from ..utils import get_metadata
+from src.utils import get_metadata
+
 from . import httpx, ogr2ogr
 
 logger = getLogger(__name__)
 
 
-def main():
+def main() -> None:
     """Downloads all available COD boundary data from ITOS ArcGIS server.
 
     Uses the metadata.csv sheet generated with a separate module to iterate through each
@@ -23,12 +22,14 @@ def main():
     """
     logger.info("Starting")
     download = ogr2ogr.download if which("ogr2ogr") else httpx.download
-    metadata = []
     records = get_metadata()
+    metadata = []
     for record in records:
-        for level in range(5):
-            if record[f"itos_index_{level}"] is not None:
-                metadata.append({**record, "admin_level": level})
+        metadata.extend(
+            {**record, "admin_level": level}
+            for level in range(5)
+            if record[f"itos_index_{level}"] is not None
+        )
     pbar = tqdm(metadata)
     for row in pbar:
         iso3 = row["iso3"]
