@@ -25,6 +25,14 @@ parser.add_argument(
     "--iso3",
     help="Comma separated list of ISO3 codes used by commands.",
 )
+parser.add_argument(
+    "--checks-include",
+    help="Comma separated checks to include.",
+)
+parser.add_argument(
+    "--checks-exclude",
+    help="Comma separated checks to exclude.",
+)
 args = parser.parse_args()
 
 ATTEMPT = int(getenv("ATTEMPT", "5"))

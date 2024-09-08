@@ -60,6 +60,23 @@ def get_iso3() -> list[str]:
     return [x.strip().upper() for x in iso3_list if x.strip() != ""]
 
 
+def get_checks_filter() -> tuple[list[str], list[str]]:
+    """Gets a list of checks from an environment variable or argparser.
+
+    Returns:
+        List of checks values cleaned of potential human error.
+    """
+    checks_include = getenv("CHECKS_INCLUDE", "").split(",")
+    checks_exclude = getenv("CHECKS_EXCLUDE", "").split(",")
+    if args.checks_include:
+        checks_include = args.checks_include.split(",")
+    if args.checks_exclude:
+        checks_exclude = args.checks_exclude.split(",")
+    checks_include = [x.strip().lower() for x in checks_include if x.strip() != ""]
+    checks_exclude = [x.strip().lower() for x in checks_exclude if x.strip() != ""]
+    return checks_include, checks_exclude
+
+
 def get_metadata() -> list[dict[Hashable, Any]]:
     """Load the metadata table and create a list with every COD admin layer to download.
 

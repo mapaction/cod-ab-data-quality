@@ -1,4 +1,5 @@
 from logging import getLogger
+from typing import Any
 
 from geopandas import GeoDataFrame, read_file
 from pandas import DataFrame
@@ -6,11 +7,37 @@ from pyogrio.errors import DataSourceError
 from tqdm import tqdm
 
 from src.config import boundaries_dir, tables_dir
-from src.utils import get_metadata
+from src.utils import get_checks_filter, get_metadata
 
-from . import dates, geometry, geometry_overlaps, languages, table_data_completeness
+from . import (
+    dates,
+    geometry,
+    geometry_hierarchy,
+    geometry_overlaps,
+    languages,
+    table_data_completeness,
+)
 
 logger = getLogger(__name__)
+
+
+def filter_checks(checks: list[Any]) -> list[Any]:
+    """Filters checks performed by environment variable or argparser.
+
+    Args:
+        checks: List of checks to perform.
+
+    Returns:
+        Filtered list of checks.
+    """
+    checks_include, checks_exclude = get_checks_filter()
+    if checks_include:
+        checks = [x for x in checks if x[0].__name__.split(".")[-1] in checks_include]
+    if checks_exclude:
+        checks = [
+            x for x in checks if x[0].__name__.split(".")[-1] not in checks_exclude
+        ]
+    return checks
 
 
 def main() -> None:
@@ -36,14 +63,16 @@ def main() -> None:
     logger.info("Starting")
 
     # NOTE: Register checks here.
-    checks = (
+    checks = [
         (geometry, []),
         (geometry_overlaps, []),
+        (geometry_hierarchy, []),
         (table_data_completeness, []),
         (dates, []),
         (languages, []),
-    )
+    ]
 
+    checks = filter_checks(checks)
     metadata = get_metadata()
     pbar = tqdm(metadata)
     for row in pbar:
