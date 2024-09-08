@@ -4,7 +4,60 @@ from src.checks.table_data_formatting_has_data import main
 def test_table_data_formatting_has_data(iso3, gdfs):
     actual = main(iso3, gdfs)
     expected = [
-        {"iso3": "mdg", "level": admin_level, "has_at_least_1_data_column": True}
-        for admin_level in range(5)
+        {
+            "iso3": "mdg",
+            "level": 0,
+            "levels_with_data": 1,
+            "levels_with_name": 1,
+            "levels_with_pcode": 1,
+            "levels_with_reference_name": 1,
+            "levels_with_alternative_name": 0,
+            "name_count": 1,
+            "alternative_name_count": 0,
+        },
+        {
+            "iso3": "mdg",
+            "level": 1,
+            "levels_with_data": 2,
+            "levels_with_name": 2,
+            "levels_with_pcode": 2,
+            "levels_with_reference_name": 1,
+            "levels_with_alternative_name": 0,
+            "name_count": 2,
+            "alternative_name_count": 0,
+        },
+        {
+            "iso3": "mdg",
+            "level": 2,
+            "levels_with_data": 3,
+            "levels_with_name": 3,
+            "levels_with_pcode": 3,
+            "levels_with_reference_name": 1,
+            "levels_with_alternative_name": 0,
+            "name_count": 3,
+            "alternative_name_count": 0,
+        },
+        {
+            "iso3": "mdg",
+            "level": 3,
+            "levels_with_data": 4,
+            "levels_with_name": 4,
+            "levels_with_pcode": 4,
+            "levels_with_reference_name": 1,
+            "levels_with_alternative_name": 0,
+            "name_count": 4,
+            "alternative_name_count": 0,
+        },
+        {
+            "iso3": "mdg",
+            "level": 4,
+            "levels_with_data": 5,
+            "levels_with_name": 5,
+            "levels_with_pcode": 5,
+            "levels_with_reference_name": 1,
+            "levels_with_alternative_name": 0,
+            "name_count": 5,
+            "alternative_name_count": 0,
+        },
     ]
     assert actual == expected

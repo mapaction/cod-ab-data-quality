@@ -7,7 +7,7 @@ def test_table_data_formatting_heirarchical(iso3, gdfs):
         {
             "iso3": "mdg",
             "level": admin_level,
-            "proportion_of_expected_heirarchical_columns": 1.0,
+            "total_heirarchical_columns": admin_level + 1,
         }
         for admin_level in range(5)
     ]

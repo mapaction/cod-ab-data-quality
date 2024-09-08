@@ -1,4 +1,4 @@
-import re
+from re import match
 
 from geopandas import GeoDataFrame
 
@@ -21,8 +21,55 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
         row = {
             "iso3": iso3,
             "level": admin_level,
-            "has_any_data_columns": any(
-                re.match(ADMIN_BOUNDARY_REGEX, column) for column in gdf.columns
+            "levels_with_data": sum(
+                [
+                    any(column.startswith(f"ADM{level}") for column in gdf.columns)
+                    for level in range(admin_level + 1)
+                ]
+            ),
+            "levels_with_name": sum(
+                [
+                    any(
+                        bool(match(rf"^ADM{level}_[A-Z][A-Z]$", column))
+                        for column in gdf.columns
+                    )
+                    for level in range(admin_level + 1)
+                ]
+            ),
+            "levels_with_pcode": sum(
+                [
+                    any(column == f"ADM{level}_PCODE" for column in gdf.columns)
+                    for level in range(admin_level + 1)
+                ]
+            ),
+            "levels_with_reference_name": sum(
+                [
+                    any(column == f"ADM{level}_REF" for column in gdf.columns)
+                    for level in range(admin_level + 1)
+                ]
+            ),
+            "levels_with_alternative_name": sum(
+                [
+                    any(
+                        bool(match(rf"^ADM{level}ALT[1-2]_[A-Z][A-Z]$", column))
+                        for column in gdf.columns
+                    )
+                    for level in range(admin_level + 1)
+                ]
+            ),
+            "name_count": sum(
+                [
+                    bool(match(rf"^ADM{level}_[A-Z][A-Z]$", column))
+                    for column in gdf.columns
+                    for level in range(admin_level + 1)
+                ]
+            ),
+            "alternative_name_count": sum(
+                [
+                    bool(match(rf"^ADM{level}ALT[1-2]_[A-Z][A-Z]$", column))
+                    for column in gdf.columns
+                    for level in range(admin_level + 1)
+                ]
             ),
         }
         check_results.append(row)
