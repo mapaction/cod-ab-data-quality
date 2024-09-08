@@ -33,13 +33,12 @@ def join_itos_metadata(itos: dict) -> dict[str, Any]:
     Returns:
         Country config supplemented with extra properties.
     """
-    row = {
+    return {
         "itos_url": itos["url"],
         "itos_service": itos["directory"],
         "itos_level": list(itos["indexes"].keys())[-1],
+        **{
+            f"itos_index_{level}": itos["indexes"].get(level)
+            for level in range(ADMIN_LEVELS + 1)
+        },
     }
-    row |= {
-        f"itos_index_{level}": itos["indexes"].get(level)
-        for level in range(ADMIN_LEVELS + 1)
-    }
-    return row
