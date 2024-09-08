@@ -1,7 +1,7 @@
 from collections.abc import Hashable
 from os import getenv
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import pandas as pd
 from httpx import Client, Response
@@ -75,3 +75,27 @@ def get_metadata() -> list[dict[Hashable, Any]]:
     if len(iso3_list):
         records = [x for x in records if x["iso3"] in iso3_list]
     return records
+
+
+def get_epsg_ease(min_lat: float, max_lat: float) -> Literal[6931, 6932, 6933]:
+    """Gets the code for appropriate Equal-Area Scalable Earth grid based on latitude.
+
+    Args:
+        min_lat: Minimum latitude of geometry from bounds.
+        max_lat: Maximum latitude of geometry from bounds.
+
+    Returns:
+        EPSG for global EASE grid if area touches neither or both poles, otherwise a
+        north or south grid if the area touches either of those zones.
+    """
+    latitude_limit = 80
+    epsg_ease_north = 6931
+    epsg_ease_south = 6932
+    epsg_ease_global = 6933
+    if max_lat >= latitude_limit and min_lat <= -latitude_limit:
+        return epsg_ease_global
+    if max_lat >= latitude_limit:
+        return epsg_ease_north
+    if min_lat <= -latitude_limit:
+        return epsg_ease_south
+    return epsg_ease_global
