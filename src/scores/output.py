@@ -59,11 +59,11 @@ def style(
     between_rd = format_between(format_rd, 0, 0.333)
     between_yl = format_between(format_yl, 0.333, 0.666)
     between_gn = format_between(format_gn, 0.666, 1)
-    worksheet.autofit()
     worksheet.set_column(first_col, last_col, None, format_percent)
     worksheet.conditional_format(first_row, first_col, last_row, last_col, between_rd)
     worksheet.conditional_format(first_row, first_col, last_row, last_col, between_yl)
     worksheet.conditional_format(first_row, first_col, last_row, last_col, between_gn)
+    worksheet.autofit()
 
 
 def aggregate(checks: DataFrame) -> DataFrame:
@@ -77,7 +77,9 @@ def aggregate(checks: DataFrame) -> DataFrame:
     """
     checks = checks.drop(columns=["level"])
     checks = checks.groupby("iso3").mean()
+    checks["error_free"] = checks.min(axis=1)
     checks["score"] = checks.mean(axis=1)
+    checks = checks.round(3)
     return checks.sort_values(by=["score"])
 
 

@@ -1,9 +1,8 @@
 from geopandas import GeoDataFrame
 
-from src.config import CheckReturnList
+from src.config import EPSG_WGS84, CheckReturnList
 from src.utils import get_epsg_ease
 
-EPSG_WGS84 = 4326
 METERS_PER_KM = 1_000_000
 PRECISION = 6
 

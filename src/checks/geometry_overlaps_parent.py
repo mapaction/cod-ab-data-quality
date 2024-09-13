@@ -27,7 +27,7 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
             row = {
                 "iso3": iso3,
                 "level": admin_level,
-                "geom_parent_overlaps": parents - len(gdf.index),
+                "geom_overlaps_parent": parents - len(gdf.index),
             }
             check_results.append(row)
     return check_results

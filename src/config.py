@@ -41,6 +41,8 @@ TIMEOUT = int(getenv("TIMEOUT", "60"))
 TIMEOUT_DOWNLOAD = int(getenv("TIMEOUT_DOWNLOAD", "600"))
 ADMIN_LEVELS = int(getenv("ADMIN_LEVELS", "5"))
 
+EPSG_WGS84 = 4326
+
 # NOTE: Could do more with this type, as iso3 and levels keys are required.
 type CheckReturnList = list[dict[str, Any]]
 
