@@ -2,6 +2,8 @@ from typing import Any
 
 from pandas import Timestamp
 
+from src.config import ADMIN_LEVELS
+
 
 def join_hdx_metadata(hdx: dict) -> dict[str, Any]:
     """Returns new properties for contry config from HDX.
@@ -35,9 +37,8 @@ def join_itos_metadata(itos: dict) -> dict[str, Any]:
         "itos_url": itos["url"],
         "itos_service": itos["directory"],
         "itos_level": list(itos["indexes"].keys())[-1],
-        "itos_index_0": itos["indexes"].get(0),
-        "itos_index_1": itos["indexes"].get(1),
-        "itos_index_2": itos["indexes"].get(2),
-        "itos_index_3": itos["indexes"].get(3),
-        "itos_index_4": itos["indexes"].get(4),
+        **{
+            f"itos_index_{level}": itos["indexes"].get(level)
+            for level in range(ADMIN_LEVELS + 1)
+        },
     }

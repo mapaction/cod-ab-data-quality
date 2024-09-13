@@ -31,6 +31,13 @@ ATTEMPT = int(getenv("ATTEMPT", "5"))
 WAIT = int(getenv("WAIT", "10"))
 TIMEOUT = int(getenv("TIMEOUT", "60"))
 TIMEOUT_DOWNLOAD = int(getenv("TIMEOUT_DOWNLOAD", "600"))
+ADMIN_LEVELS = int(getenv("ADMIN_LEVELS", "5"))
+
+EPSG_WGS84 = 4326
+GEOJSON_PRECISION = 6
+METERS_PER_KM = 1_000_000
+POLYGON = "Polygon"
+VALID_GEOMETRY = "Valid Geometry"
 
 # NOTE: Could do more with this type, as iso3 and levels keys are required.
 type CheckReturnList = list[dict[str, Any]]
@@ -48,11 +55,7 @@ metadata_columns = [
     "itos_url",
     "itos_service",
     "itos_level",
-    "itos_index_0",
-    "itos_index_1",
-    "itos_index_2",
-    "itos_index_3",
-    "itos_index_4",
+    *[f"itos_index_{level}" for level in range(ADMIN_LEVELS + 1)],
     "hdx_url",
     "hdx_date",
     "hdx_update",

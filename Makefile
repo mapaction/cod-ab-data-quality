@@ -13,7 +13,7 @@ hooks:
 
 test:
 	@echo "Running unit tests.."
-	@poetry run python -m pytest
+	@poetry run pytest
 
 lint:
 	@echo "Running lint tests.."

@@ -3,6 +3,7 @@ from shutil import which
 
 from tqdm import tqdm
 
+from src.config import ADMIN_LEVELS
 from src.utils import get_metadata
 
 from . import httpx, ogr2ogr
@@ -27,7 +28,7 @@ def main() -> None:
     for record in records:
         metadata.extend(
             {**record, "admin_level": level}
-            for level in range(5)
+            for level in range(ADMIN_LEVELS + 1)
             if record[f"itos_index_{level}"] is not None
         )
     pbar = tqdm(metadata)

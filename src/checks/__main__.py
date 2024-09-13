@@ -8,7 +8,7 @@ from tqdm import tqdm
 from src.config import boundaries_dir, tables_dir
 from src.utils import get_metadata
 
-from . import dates, languages, table_data_completeness
+from . import dates, geometry, geometry_overlaps, languages, table_data_completeness
 
 logger = getLogger(__name__)
 
@@ -36,7 +36,13 @@ def main() -> None:
     logger.info("Starting")
 
     # NOTE: Register checks here.
-    checks = ((dates, []), (languages, []), (table_data_completeness, []))
+    checks = (
+        (geometry, []),
+        (geometry_overlaps, []),
+        (table_data_completeness, []),
+        (dates, []),
+        (languages, []),
+    )
 
     metadata = get_metadata()
     pbar = tqdm(metadata)
@@ -59,7 +65,7 @@ def main() -> None:
             results.extend(rows)
     output = None
     for _, results in checks:
-        partial = DataFrame(results)
+        partial = DataFrame(results).convert_dtypes()
         if output is None:
             output = partial
         else:
