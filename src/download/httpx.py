@@ -1,21 +1,24 @@
-"""Download functions using HTTPX, avoiding GDAL install."""
-
 from json import dump
 from logging import getLogger
+from pathlib import Path
+from typing import Any
 
 from geopandas import read_file
 from pandas import to_datetime
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from ..config import ATTEMPT, TIMEOUT, TIMEOUT_DOWNLOAD, WAIT, boundaries
-from ..utils import client_get
+from src.config import ATTEMPT, TIMEOUT, TIMEOUT_DOWNLOAD, WAIT, boundaries_dir
+from src.utils import client_get
 
 logger = getLogger(__name__)
 
 
 def get_layer(
-    url: str, idx: int, records: int | None = None, offset: int | None = None
-):
+    url: str,
+    idx: int,
+    records: int | None = None,
+    offset: int | None = None,
+) -> tuple[str, dict[str, Any]]:
     """Builds a URL used for retrieving ESRI JSON from an ArcGIS Feature Service.
 
     The query parameter "f" (format) is set to return JSON (default is HTML), "where" is
@@ -50,7 +53,7 @@ def get_layer(
     return f"{url}/{idx}/query", query
 
 
-def get_layer_count(url: str, idx: int):
+def get_layer_count(url: str, idx: int) -> tuple[str, dict[str, Any]]:
     """Gets a URL containing the total number of features in a layer.
 
     The query parameter "f" (format) is set to return JSON (default is HTML), "where" is
@@ -74,7 +77,7 @@ def get_layer_count(url: str, idx: int):
     return f"{url}/{idx}/query", query
 
 
-def save_file(data: dict, filename: str):
+def save_file(data: dict, filename: str) -> None:
     """Saves ESRI JSON data as a GeoPackage, normalizing attributes.
 
     First, temporarily saves an ESRI JSON file to disk to free up memory.
@@ -92,23 +95,23 @@ def save_file(data: dict, filename: str):
         data: ESRI JSON represented as a dict.
         filename: File name of the output.
     """
-    tmp = boundaries / f"{filename}.json"
-    with open(tmp, "w") as f:
+    tmp = boundaries_dir / f"{filename}.json"
+    with Path.open(tmp, "w") as f:
         dump(data, f, separators=(",", ":"))
     gdf = read_file(tmp, use_arrow=True)
-    is_polygon = "Polygon" in gdf["geometry"].geom_type.values
-    is_multi_polygon = "MultiPolygon" in gdf["geometry"].geom_type.values
+    is_polygon = "Polygon" in gdf["geometry"].geom_type.to_numpy()
+    is_multi_polygon = "MultiPolygon" in gdf["geometry"].geom_type.to_numpy()
     if not is_polygon and not is_multi_polygon:
         raise RuntimeError(filename)
     gdf = gdf.drop(columns=["OBJECTID"], errors="ignore")
     for col in gdf.select_dtypes(include=["datetime"]):
         gdf[col] = to_datetime(gdf[col], utc=True)
-    gdf.to_file(boundaries / f"{filename}.gpkg")
+    gdf.to_file(boundaries_dir / f"{filename}.gpkg")
     tmp.unlink(missing_ok=True)
 
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
-def download(iso3: str, lvl: int, idx: int, url: str):
+def download(iso3: str, lvl: int, idx: int, url: str) -> None:
     """Downloads ESRI JSON from an ArcGIS Feature Server and saves as GeoPackage.
 
     First, attempts to download ESRI JSON in a single request. This request may fail due
@@ -153,13 +156,12 @@ def download(iso3: str, lvl: int, idx: int, url: str):
                 esri_json = client_get(layer_url, TIMEOUT_DOWNLOAD, layer_query).json()
                 if "error" in esri_json:
                     break
+                if result is None:
+                    result = esri_json
                 else:
-                    if result is None:
-                        result = esri_json
-                    else:
-                        result["features"].extend(esri_json["features"])
+                    result["features"].extend(esri_json["features"])
             if result is not None:
                 save_file(result, filename)
                 break
-    if not (boundaries / f"{filename}.gpkg").is_file():
+    if not (boundaries_dir / f"{filename}.gpkg").is_file():
         raise RuntimeError(filename)

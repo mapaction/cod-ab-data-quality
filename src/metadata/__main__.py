@@ -1,19 +1,19 @@
-"""Main entry point for the script."""
-
 from logging import getLogger
+from typing import Any
 
 from pandas import DataFrame
 from tqdm import tqdm
 
-from ..config import TIMEOUT, metadata_columns, tables
-from ..utils import client_get, get_iso3
+from src.config import TIMEOUT, metadata_columns, tables_dir
+from src.utils import client_get, get_iso3
+
 from .getters import get_hdx_metadata, get_itos_metadata
 from .join import join_hdx_metadata, join_itos_metadata
 
 logger = getLogger(__name__)
 
 
-def get_metadata():
+def get_metadata() -> list[dict[str, Any]]:
     """Gets metadata for all 249 ISO 3166 country codes.
 
     Iterates through each location in the OCHA Country and Territory name list and adds
@@ -36,14 +36,14 @@ def get_metadata():
         row["name"] = row["label"]["default"]
         hdx = get_hdx_metadata(row["iso3"])
         if hdx is not None:
-            row = join_hdx_metadata(row, hdx)
+            row.update(join_hdx_metadata(hdx))
         itos = get_itos_metadata(row["iso3"])
         if itos is not None:
-            row = join_itos_metadata(row, itos)
+            row.update(join_itos_metadata(itos))
     return metadata
 
 
-def save_metadata(metadata: list[dict]):
+def save_metadata(metadata: list[dict]) -> None:
     """Saves country metadata as a CSV.
 
     Although the complete list of country codes contains 249 items, not all of these
@@ -53,14 +53,13 @@ def save_metadata(metadata: list[dict]):
     Args:
         metadata: A list of country config dicts.
     """
-    df = DataFrame(metadata)
-    df = df[df["hdx_url"].notna() | df["itos_url"].notna()]
-    df = df[metadata_columns]
-    dest = tables / "metadata.csv"
-    df.to_csv(dest, encoding="utf-8-sig", float_format="%.0f", index=False)
+    output = DataFrame.from_records(metadata).convert_dtypes()
+    output = output[output["hdx_url"].notna() | output["itos_url"].notna()]
+    output = output[metadata_columns]
+    output.to_csv(tables_dir / "metadata.csv", index=False, encoding="utf-8-sig")
 
 
-def main():
+def main() -> None:
     """Gets metadata for each Common Operational Dataset (COD).
 
     This is needed to generate a master list of all available COD datasets with

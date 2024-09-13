@@ -1,5 +1,3 @@
-"""Project configuration."""
-
 from argparse import ArgumentParser
 from logging import INFO, WARNING, basicConfig, getLogger
 from os import environ, getenv
@@ -16,6 +14,7 @@ basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 getLogger("httpx").setLevel(WARNING)
+getLogger("numexpr.utils").setLevel(WARNING)
 getLogger("pyogrio._io").setLevel(WARNING)
 
 environ["OGR_GEOJSON_MAX_OBJ_SIZE"] = "0"
@@ -23,7 +22,8 @@ environ["OGR_ORGANIZE_POLYGONS"] = "ONLY_CCW"
 
 parser = ArgumentParser()
 parser.add_argument(
-    "--iso3", help="Comma separated list of ISO3 codes used by commands."
+    "--iso3",
+    help="Comma separated list of ISO3 codes used by commands.",
 )
 args = parser.parse_args()
 
@@ -31,12 +31,22 @@ ATTEMPT = int(getenv("ATTEMPT", "5"))
 WAIT = int(getenv("WAIT", "10"))
 TIMEOUT = int(getenv("TIMEOUT", "60"))
 TIMEOUT_DOWNLOAD = int(getenv("TIMEOUT_DOWNLOAD", "600"))
+ADMIN_LEVELS = int(getenv("ADMIN_LEVELS", "5"))
+
+EPSG_WGS84 = 4326
+GEOJSON_PRECISION = 6
+METERS_PER_KM = 1_000_000
+POLYGON = "Polygon"
+VALID_GEOMETRY = "Valid Geometry"
+
+# NOTE: Could do more with this type, as iso3 and levels keys are required.
+type CheckReturnList = list[dict[str, Any]]
 
 cwd = Path(__file__).parent
-tables = cwd / "../data/tables"
-tables.mkdir(parents=True, exist_ok=True)
-boundaries = cwd / "../data/boundaries"
-boundaries.mkdir(parents=True, exist_ok=True)
+tables_dir = cwd / "../data/tables"
+tables_dir.mkdir(parents=True, exist_ok=True)
+boundaries_dir = cwd / "../data/boundaries"
+boundaries_dir.mkdir(parents=True, exist_ok=True)
 
 metadata_columns = [
     "iso3",
@@ -45,11 +55,7 @@ metadata_columns = [
     "itos_url",
     "itos_service",
     "itos_level",
-    "itos_index_0",
-    "itos_index_1",
-    "itos_index_2",
-    "itos_index_3",
-    "itos_index_4",
+    *[f"itos_index_{level}" for level in range(ADMIN_LEVELS + 1)],
     "hdx_url",
     "hdx_date",
     "hdx_update",

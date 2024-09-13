@@ -4,7 +4,11 @@ from src.config import CheckReturnList
 
 
 def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
-    """Check completeness of an admin boundary by checking column hierarchy.
+    """Check for the number of self-overlaping geometries.
+
+    Conducting a spatial join predicated by overlaps is very computationally expensive.
+    This module has been separated out from other geometry checks so that it can be made
+    optional.
 
     Args:
         iso3: ISO3 code of the current location being checked.
@@ -16,15 +20,10 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
     """
     check_results = []
     for admin_level, gdf in enumerate(gdfs):
-        row = {
-            "iso3": iso3,
-            "level": admin_level,
-            "total_heirarchical_columns": sum(
-                [
-                    any(column.startswith(f"ADM{level}") for column in gdf.columns)
-                    for level in range(admin_level + 1)
-                ],
-            ),
-        }
+        row = {"iso3": iso3, "level": admin_level}
+        if gdf.active_geometry_name:
+            overlaps = gdf.sjoin(gdf, predicate="overlaps")
+            overlap_count = len(overlaps[overlaps.index != overlaps.index_right].index)
+            row |= {"geom_overlaps": overlap_count / 2}
         check_results.append(row)
     return check_results

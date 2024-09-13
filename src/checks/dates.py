@@ -1,5 +1,3 @@
-"""Check for summarizing date info."""
-
 from geopandas import GeoDataFrame
 
 from src.config import CheckReturnList
@@ -16,9 +14,9 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
 
     The following are a list of source and output columns:
     - source: "date"
-        - output: "date_1", "date_2", etc...
+        - output: "date_count", "date_1", "date_2", etc...
     - source: "validOn"
-        - output: "update_1", "update_2", etc...
+        - output: "update_count", "update_1", "update_2", etc...
 
     Args:
         iso3: ISO3 code of the current location being checked.
@@ -30,13 +28,15 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
     """
     check_results = []
     for admin_level, gdf in enumerate(gdfs):
-        row = {"iso3": iso3, "level": admin_level}
+        row = {"iso3": iso3, "level": admin_level, "date_count": 0, "update_count": 0}
         try:
             gdf_date = gdf["date"].dt.date.drop_duplicates()
             for index, value in enumerate(gdf_date):
+                row["date_count"] += 1
                 row[f"date_{index+1}"] = value
             gdf_update = gdf["validOn"].dt.date.drop_duplicates()
             for index, value in enumerate(gdf_update):
+                row["update_count"] += 1
                 row[f"update_{index+1}"] = value
         except KeyError:
             pass
