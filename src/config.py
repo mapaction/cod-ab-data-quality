@@ -42,6 +42,10 @@ TIMEOUT_DOWNLOAD = int(getenv("TIMEOUT_DOWNLOAD", "600"))
 ADMIN_LEVELS = int(getenv("ADMIN_LEVELS", "5"))
 
 EPSG_WGS84 = 4326
+GEOJSON_PRECISION = 6
+METERS_PER_KM = 1_000_000
+POLYGON = "Polygon"
+VALID_GEOMETRY = "Valid Geometry"
 
 # NOTE: Could do more with this type, as iso3 and levels keys are required.
 type CheckReturnList = list[dict[str, Any]]

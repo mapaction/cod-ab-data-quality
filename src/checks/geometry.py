@@ -1,10 +1,14 @@
 from geopandas import GeoDataFrame
 
-from src.config import EPSG_WGS84, CheckReturnList
+from src.config import (
+    EPSG_WGS84,
+    GEOJSON_PRECISION,
+    METERS_PER_KM,
+    POLYGON,
+    VALID_GEOMETRY,
+    CheckReturnList,
+)
 from src.utils import get_epsg_ease
-
-METERS_PER_KM = 1_000_000
-PRECISION = 6
 
 
 def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
@@ -39,7 +43,7 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
         row = {"iso3": iso3, "level": admin_level}
         if gdf.active_geometry_name:
             min_x, min_y, max_x, max_y = [
-                round(x, PRECISION)
+                round(x, GEOJSON_PRECISION)
                 for x in gdf.geometry.to_crs(EPSG_WGS84).total_bounds
             ]
             epsg_ease = get_epsg_ease(min_y, max_y)
@@ -51,11 +55,11 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                 {
                     reason.split("[")[0]
                     for reason in gdf.geometry.is_valid_reason()
-                    if reason != "Valid Geometry"
+                    if reason != VALID_GEOMETRY
                 },
             )
             row |= {
-                "geom_is_polygon": gdf.geometry.geom_type.str.contains("Polygon").all(),
+                "geom_is_polygon": gdf.geometry.geom_type.str.contains(POLYGON).all(),
                 "geom_is_xy": not gdf.geometry.has_z.any(),
                 "geom_is_valid": gdf.geometry.is_valid.all(),
                 "geom_invalid_reason": invalid_reason,
