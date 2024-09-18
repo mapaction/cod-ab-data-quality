@@ -17,6 +17,7 @@ from . import (
     geometry_overlaps_self,
     languages,
     table_data_completeness,
+    table_data_formatting_has_data,
 )
 
 logger = getLogger(__name__)
@@ -71,6 +72,7 @@ def main() -> None:
         (table_data_completeness, []),
         (dates, []),
         (languages, []),
+        (table_data_formatting_has_data, []),
     ]
 
     checks = filter_checks(checks)
