@@ -1,3 +1,4 @@
+from argparse import ArgumentParser, Namespace
 from collections.abc import Hashable
 from os import getenv
 from pathlib import Path
@@ -8,7 +9,32 @@ from httpx import Client, Response
 from pandas import DataFrame, to_datetime
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from .config import ATTEMPT, WAIT, args, tables_dir
+from .config import ATTEMPT, WAIT, tables_dir
+
+
+def parse_args(argv: list[str] | None = None) -> Namespace:
+    """Parses command line arguments.
+
+    Args:
+        argv: sys.argv. Defaults to None.
+
+    Returns:
+        argparse Namespace.
+    """
+    parser = ArgumentParser()
+    parser.add_argument(
+        "--iso3",
+        help="Comma separated list of ISO3 codes used by commands.",
+    )
+    parser.add_argument(
+        "--checks-include",
+        help="Comma separated checks to include.",
+    )
+    parser.add_argument(
+        "--checks-exclude",
+        help="Comma separated checks to exclude.",
+    )
+    return parser.parse_args(argv)
 
 
 @retry(stop=stop_after_attempt(ATTEMPT), wait=wait_fixed(WAIT))
@@ -54,6 +80,7 @@ def get_iso3() -> list[str]:
     Returns:
         List of ISO-3 values cleaned of potential human error.
     """
+    args = parse_args()
     iso3_list = getenv("ISO3", "").split(",")
     if args.iso3:
         iso3_list = args.iso3.split(",")
@@ -66,6 +93,7 @@ def get_checks_filter() -> tuple[list[str], list[str]]:
     Returns:
         List of checks values cleaned of potential human error.
     """
+    args = parse_args()
     checks_include = getenv("CHECKS_INCLUDE", "").split(",")
     checks_exclude = getenv("CHECKS_EXCLUDE", "").split(",")
     if args.checks_include:
