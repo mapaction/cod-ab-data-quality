@@ -15,7 +15,6 @@ from . import (
     languages,
     table_data_completeness,
     table_data_formatting_has_data,
-    table_data_formatting_heirarchical,
 )
 
 logger = getLogger(__name__)
@@ -51,7 +50,6 @@ def main() -> None:
         (dates, []),
         (languages, []),
         (table_data_formatting_has_data, []),
-        (table_data_formatting_heirarchical, []),
     )
 
     metadata = get_metadata()
