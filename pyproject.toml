@@ -1,3 +1,7 @@
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
+
 [tool.poetry]
 authors = ["ediakatos <ediakatos@mapaction.org>", "maxmalynowsky"]
 description = "This project serves as a template for initialising new Python projects with Poetry, including basic configuration for dependency management and virtual environment setup. It is designed to be cloned for quick setup of new repositories on GitHub."
@@ -26,9 +30,8 @@ pymarkdownlnt = "^0.9.23"
 pytest = "^8.3.3"
 ruff = "^0.6.5"
 
-[build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core"]
+[tool.pytest.ini_options]
+markers = ["slow: marks tests as slow (deselect with '-m \"not slow\"')"]
 
 [tool.ruff]
 fix = true

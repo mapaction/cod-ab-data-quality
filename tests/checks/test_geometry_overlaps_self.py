@@ -1,8 +1,10 @@
+import pytest
 from geopandas import GeoDataFrame
 
 from checks.geometry_overlaps_self import main
 
 
+@pytest.mark.slow
 def test_mdg_geometry_overlaps_self(iso3: str, gdfs: list[GeoDataFrame]) -> None:
     actual = main(iso3, gdfs)
     expected = [
