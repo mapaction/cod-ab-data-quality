@@ -8,7 +8,14 @@ from tqdm import tqdm
 from src.config import boundaries_dir, tables_dir
 from src.utils import get_metadata
 
-from . import dates, geometry, geometry_overlaps, languages, table_data_completeness
+from . import (
+    dates,
+    geometry,
+    geometry_overlaps,
+    languages,
+    table_data_completeness,
+    table_data_formatting_has_data,
+)
 
 logger = getLogger(__name__)
 
@@ -42,6 +49,7 @@ def main() -> None:
         (table_data_completeness, []),
         (dates, []),
         (languages, []),
+        (table_data_formatting_has_data, []),
     )
 
     metadata = get_metadata()
