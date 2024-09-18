@@ -1,4 +1,3 @@
-from argparse import ArgumentParser
 from logging import INFO, WARNING, basicConfig, getLogger
 from os import environ, getenv
 from pathlib import Path
@@ -19,21 +18,6 @@ getLogger("pyogrio._io").setLevel(WARNING)
 
 environ["OGR_GEOJSON_MAX_OBJ_SIZE"] = "0"
 environ["OGR_ORGANIZE_POLYGONS"] = "ONLY_CCW"
-
-parser = ArgumentParser()
-parser.add_argument(
-    "--iso3",
-    help="Comma separated list of ISO3 codes used by commands.",
-)
-parser.add_argument(
-    "--checks-include",
-    help="Comma separated checks to include.",
-)
-parser.add_argument(
-    "--checks-exclude",
-    help="Comma separated checks to exclude.",
-)
-args = parser.parse_args()
 
 ATTEMPT = int(getenv("ATTEMPT", "5"))
 WAIT = int(getenv("WAIT", "10"))

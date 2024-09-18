@@ -1,8 +1,10 @@
+import pytest
 from geopandas import GeoDataFrame
 
 from src.checks.geometry_hierarchy import main
 
 
+@pytest.mark.slow
 def test_mdg_geometry_hierarchy(iso3: str, gdfs: list[GeoDataFrame]) -> None:
     actual = main(iso3, gdfs)
     expected = [
