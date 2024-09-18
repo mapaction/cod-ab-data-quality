@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from logging import INFO, WARNING, basicConfig, getLogger
+from logging import ERROR, INFO, WARNING, basicConfig, getLogger
 from os import environ, getenv
 from pathlib import Path
 from typing import Any
@@ -13,6 +13,7 @@ basicConfig(
     format="%(asctime)s - %(name)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
+getLogger("fontTools").setLevel(ERROR)
 getLogger("httpx").setLevel(WARNING)
 getLogger("numexpr.utils").setLevel(WARNING)
 getLogger("pyogrio._io").setLevel(WARNING)
@@ -44,6 +45,7 @@ ADMIN_LEVELS = int(getenv("ADMIN_LEVELS", "5"))
 EPSG_WGS84 = 4326
 GEOJSON_PRECISION = 6
 METERS_PER_KM = 1_000_000
+PLOTLY_SIMPLIFY = 0.000_01
 POLYGON = "Polygon"
 VALID_GEOMETRY = "Valid Geometry"
 
@@ -51,10 +53,14 @@ VALID_GEOMETRY = "Valid Geometry"
 type CheckReturnList = list[dict[str, Any]]
 
 cwd = Path(__file__).parent
-tables_dir = cwd / "../data/tables"
-tables_dir.mkdir(parents=True, exist_ok=True)
 boundaries_dir = cwd / "../data/boundaries"
 boundaries_dir.mkdir(parents=True, exist_ok=True)
+images_dir = cwd / "../data/images"
+images_dir.mkdir(parents=True, exist_ok=True)
+reports_dir = cwd / "../data/reports"
+reports_dir.mkdir(parents=True, exist_ok=True)
+tables_dir = cwd / "../data/tables"
+tables_dir.mkdir(parents=True, exist_ok=True)
 
 metadata_columns = [
     "iso3",

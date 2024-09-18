@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <link href="file://{{ css }}" rel="stylesheet">
+</head>
+
+<body>
+  <h2>COD-AB Data Quality Report:<br />
+    {{ metadata["name"] }}</h2>
+  <p>Generated on: {{ today.strftime("%B %-d, %Y") }}</p>
+  <div class="img-grid">
+    {% for level in admin_levels %}
+    <div>
+      Admin {{ level }}
+      <img src="file://{{ images_dir }}/{{ metadata['iso3'] }}_adm{{ level }}.png" alt="not available" />
+    </div>
+    {% endfor %}
+  </div>
+  <h2>Metadata</h2>
+  <div class="metadata-grid">
+    <div><b>Links:</b></div>
+    <div>
+      {% if metadata["itos_url"] %}
+      <a href="{{ metadata['itos_url'] }}">ITOS</a>
+      {% endif %}
+      {% if metadata["hdx_url"] %}
+      <a href="{{ metadata['hdx_url'] }}">HDX</a>
+      {%endif %}
+    </div>
+    <div><b>COD Quality:</b></div>
+    <div>{{ cod_quality }}</div>
+    <div><b>ISO-3 Code:</b></div>
+    <div>{{ metadata["iso3"] }}</div>
+    <div><b>ISO-2 Code:</b></div>
+    <div>{{ metadata["iso2"] }}</div>
+    <div><b>Data Contributor:</b></div>
+    <div>{{ metadata["hdx_source_2"] }}</div>
+    <div><b>Data Source:</b></div>
+    <div>{{ metadata["hdx_source_1"] }}</div>
+    <div><b>Licence:</b></div>
+    <div>{{ metadata["hdx_license"] }}</div>
+    <div><b>Error free layers:</b></div>
+    <div>
+      {{ (scores["error_free"] * (levels + 1))|int }} of {{ levels + 1 }}
+    </div>
+    <div><b>Overall Score:</b></div>
+    <div>{{ (scores["score"] * 100)|int }}%</div>
+  </div>
+
+  <div class="pagebreak" />
+
+  <h2>Scores</h2>
+  <div class="score">
+    <div>
+      Layers which have valid geometry. Valid geometry is defined by having no empty
+      geometries, only containing polygons (no points or lines), not containing any
+      self-intersecting rings, using WGS84 CRS (EPSG:4326), and containing no
+      self-overlapping polygons.
+    </div>
+    <div>
+      {{ (scores["geometry_valid"] * (levels + 1))|int }} of {{ levels + 1 }}
+    </div>
+  </div>
+  <div class="score">
+    <div>
+      Layers which have perfect hierarchal nesting. Hierarchy is defined by each
+      sub-national unit belonging to only a single parent (does not overlap between
+      mutliple higher levels).
+    </div>
+    <div>
+      {{ (scores["geometry_hierarchy"] * (levels + 1))|int }} of {{ levels + 1 }}
+    </div>
+  </div>
+  <div class="score">
+    <div>
+      Layers which all share the same geometric bounding box. Layers not sharing the
+      same bounding box are partial layers which only cover a sub-section.
+    </div>
+    <div>
+      {{ (scores["geometry_bounds"] * (levels + 1))|int }} of {{ levels + 1 }}
+    </div>
+  </div>
+  <div class="score">
+    <div>
+      Layers which all share the same area. Layers not sharing the same area may have
+      empty areas representing water bodies whereas other layers have them filled out.
+    </div>
+    <div>
+      {{ (scores["geometry_area"] * (levels + 1))|int }} of {{ levels + 1 }}
+    </div>
+  </div>
+  <div class="score">
+    <div>
+      Layers which have at least 1 language column detected.
+    </div>
+    <div>
+      {{ (scores["languages"] * (levels + 1))|int }} of {{ levels + 1 }}
+    </div>
+  </div>
+  <div class="score">
+    <div>
+      Layers which have been updated within the last 3 years.
+    </div>
+    <div>
+      {{ (scores["dates"] * (levels + 1))|int }} of {{ levels + 1 }}
+    </div>
+  </div>
+
+  <div class="pagebreak" />
+
+  <h2>Checks</h2>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>Admin {{ level }}</div>
+    {% endfor %}
+  </div>
+  <div>Are there any empty geometries contained within the layer? (Should be No)</div>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>{{ "No" if checks[level]["geom_not_empty"] else "Yes" }}</div>
+    {% endfor %}
+  </div>
+  <div>Are all geometries in the layer of type polygon? (Should be Yes)</div>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>{{ "Yes" if checks[level]["geom_is_polygon"] else "No" }}</div>
+    {% endfor %}
+  </div>
+  <div>
+    Are all polygons 2 dimensional? In other words, do they contain only XY coordinates
+    and no Z? (Should be Yes)
+  </div>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>{{ "Yes" if checks[level]["geom_is_polygon"] else "No" }}</div>
+    {% endfor %}
+  </div>
+  <div>Are all geometries valid? (Should be Yes)</div>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>{{ "Yes" if checks[level]["geom_is_valid"] else "No" }}</div>
+    {% endfor %}
+  </div>
+  <div>If any geometries are invalid, how come?</div>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>{{ checks[level]["geom_invalid_reason"] or "N/A" }}</div>
+    {% endfor %}
+  </div>
+  <div>What EPSG projection is used in the layer? (Should be 4326)</div>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>{{ checks[level]["geom_proj"] }}</div>
+    {% endfor %}
+  </div>
+  <div>How large is the layer in square kilometers? (All values should be the same)</div>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>{{ checks[level]["geom_area_km"] }}</div>
+    {% endfor %}
+  </div>
+  <div>How many polygons overlap each other within the same layer? (Should be 0)</div>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>{{ checks[level]["geom_overlaps_self"]|int }}</div>
+    {% endfor %}
+  </div>
+  <div>
+    How many polygons are not hierarchal, meaning they cross the border between two
+    parent boundaries? (Should be 0)
+  </div>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>{{ checks[level]["geom_overlaps_parent"]|int }}</div>
+    {% endfor %}
+  </div>
+
+  <div class="pagebreak" />
+
+  <h2>Checks</h2>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>Admin {{ level }}</div>
+    {% endfor %}
+  </div>
+  <div>What percentage of cells are empty?</div>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>
+      {{ (checks[level]["number_of_missing_records"] /
+      (checks[level]["total_number_of_records"] or 1) * 100)|int }}%
+    </div>
+    {% endfor %}
+  </div>
+  <div>What is the date of the dataset's source?</div>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>
+      {% for idx in range(checks[level]["date_count"]) %}
+      <div>{{ checks[level]["date_" + (idx+1)|string].strftime("%b %-d, %Y") }}</div>
+      {% endfor %}
+      {% if checks[level]["date_count"] == 0 %}
+      <div>No Date</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div>When was the dataset last updated?</div>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>
+      {% for idx in range(checks[level]["update_count"]) %}
+      <div>{{ checks[level]["update_" + (idx+1)|string].strftime("%b %-d, %Y") }}</div>
+      {% endfor %}
+      {% if checks[level]["update_count"] == 0 %}
+      <div>No Date</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div>What languages are used in the dataset?</div>
+  <div class="checks-grid checks-grid-{{ levels }}">
+    {% for level in admin_levels %}
+    <div>
+      {% for idx in range(checks[level]["language_count"]) %}
+      <span>{{ checks[level]["language_" + (idx+1)|string] }}</span>
+      {% endfor %}
+      {% if checks[level]["language_count"] == 0 %}
+      <div>No Language</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+</body>
+
+</html>

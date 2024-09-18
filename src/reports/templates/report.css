@@ -1,0 +1,67 @@
+@page {
+  size: A4 portrait;
+  margin: 2.5cm;
+}
+
+@media print {
+  .pagebreak {
+    page-break-before: always;
+  }
+}
+
+body {
+  font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+    "Segoe UI Symbol";
+}
+
+.img-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.metadata-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0.5rem;
+}
+
+.score {
+  margin: 1rem 0;
+}
+
+.score > div:first-child {
+  margin: 1rem 0;
+}
+
+.checks-grid {
+  display: grid;
+  margin: 1rem 0;
+}
+
+.checks-grid-0 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.checks-grid-1 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.checks-grid-2 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.checks-grid-3 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.checks-grid-4 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.checks-grid-5 {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+img {
+  width: 100%;
+}

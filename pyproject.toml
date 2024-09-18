@@ -9,12 +9,16 @@ version = "0.1.0"
 [tool.poetry.dependencies]
 geopandas = "^1.0.1"
 httpx = { version = "^0.27.2", extras = ["http2"] }
+jinja2 = "^3.1.4"
+kaleido = "0.2.1"
 pandas = { version = "^2.2.2", extras = ["performance", "excel"] }
+plotly = "^5.24.1"
 pyarrow = "^17.0.0"
 python = "^3.12"
 python-dotenv = "^1.0.1"
 tenacity = "^9.0.0"
 tqdm = "^4.66.5"
+weasyprint = "^62.3"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.8.0"
