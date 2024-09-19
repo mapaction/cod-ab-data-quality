@@ -51,7 +51,7 @@ def style(
         worksheet: Excel worksheet instance.
     """
     first_row = 1
-    first_col = 1
+    first_col = 2
     format_percent = workbook.add_format({"num_format": "0%"})
     format_rd = workbook.add_format({"bg_color": "#FFC7CE", "font_color": "#9C0006"})
     format_yl = workbook.add_format({"bg_color": "#FFEB9C", "font_color": "#9C6500"})
@@ -83,7 +83,7 @@ def aggregate(checks: DataFrame) -> DataFrame:
     return checks.sort_values(by=["score"])
 
 
-def main(checks: DataFrame) -> None:
+def main(metadata: DataFrame, checks: DataFrame) -> None:
     """Aggregates scores and outputs to an Excel workbook with red/amber/green coloring.
 
     1. Groups and averages the scores generated in this module and outputs as a CSV.
@@ -95,16 +95,18 @@ def main(checks: DataFrame) -> None:
     4. Adds a final sheet specifying which date the workbook was generated on.
 
     Args:
+        metadata: metadata DataFrame.
         checks: checks DataFrame.
     """
     scores = aggregate(checks)
     scores.to_csv(tables_dir / "scores.csv", encoding="utf-8-sig")
+    scores = metadata[["iso3", "name"]].merge(scores, on="iso3")
     with ExcelWriter(tables_dir / "cod_ab_data_quality.xlsx") as writer:
-        scores.to_excel(writer, sheet_name="scores")
+        scores.to_excel(writer, sheet_name="scores", index=False)
         if isinstance(writer.book, Workbook):
             style(
                 len(scores.index),
-                len(scores.columns),
+                len(scores.columns) - 1,
                 writer.book,
                 writer.sheets["scores"],
             )

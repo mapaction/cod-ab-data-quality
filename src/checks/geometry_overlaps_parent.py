@@ -19,15 +19,24 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
     """
     check_results = []
     for admin_level, gdf in enumerate(gdfs):
-        if admin_level == 0:
-            continue
-        parent = gdfs[admin_level - 1]
-        if gdf.active_geometry_name and parent.active_geometry_name:
-            parents = len(gdf.sjoin(parent, how="left", predicate="overlaps").index)
-            row = {
-                "iso3": iso3,
-                "level": admin_level,
-                "geom_overlaps_parent": parents - len(gdf.index),
-            }
-            check_results.append(row)
+        if gdf.active_geometry_name:
+            if admin_level == 0:
+                row = {
+                    "iso3": iso3,
+                    "level": admin_level,
+                    "geom_overlaps_parent": 0,
+                }
+                check_results.append(row)
+            else:
+                parent = gdfs[admin_level - 1]
+                if parent.active_geometry_name:
+                    parents = len(
+                        gdf.sjoin(parent, how="left", predicate="overlaps").index,
+                    )
+                    row = {
+                        "iso3": iso3,
+                        "level": admin_level,
+                        "geom_overlaps_parent": parents - len(gdf.index),
+                    }
+                    check_results.append(row)
     return check_results

@@ -60,7 +60,8 @@ def main(checks: DataFrame) -> DataFrame:
     """
     scores = checks[["iso3", "level"]].copy()
     scores["geometry_valid"] = (
-        checks["geom_is_polygon"]
+        checks["geom_not_empty"]
+        & checks["geom_is_polygon"]
         & checks["geom_is_xy"]
         & checks["geom_is_valid"]
         & checks["geom_proj"].eq(EPSG_WGS84)
