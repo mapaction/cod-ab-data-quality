@@ -101,6 +101,7 @@ def main(metadata: DataFrame, checks: DataFrame) -> None:
     scores = aggregate(checks)
     scores.to_csv(tables_dir / "scores.csv", encoding="utf-8-sig")
     scores = metadata[["iso3", "name"]].merge(scores, on="iso3")
+    scores = scores.sort_values(by=["score"])
     with ExcelWriter(tables_dir / "cod_ab_data_quality.xlsx") as writer:
         scores.to_excel(writer, sheet_name="scores", index=False)
         if isinstance(writer.book, Workbook):
