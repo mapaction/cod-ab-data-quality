@@ -41,8 +41,6 @@ boundaries_dir = cwd / "../data/boundaries"
 boundaries_dir.mkdir(parents=True, exist_ok=True)
 images_dir = cwd / "../data/images"
 images_dir.mkdir(parents=True, exist_ok=True)
-reports_dir = cwd / "../data/reports"
-reports_dir.mkdir(parents=True, exist_ok=True)
 tables_dir = cwd / "../data/tables"
 tables_dir.mkdir(parents=True, exist_ok=True)
 
