@@ -12,5 +12,5 @@ def main(checks: DataFrame) -> DataFrame:
         Checks DataFrame with additional columns for scoring.
     """
     scores = checks[["iso3", "level"]].copy()
-    scores["dates"] = checks["update_1"] > Timestamp.now() - relativedelta(years=3)
+    scores["dates"] = checks["update_1"] > Timestamp.now() - relativedelta(years=1)
     return scores
