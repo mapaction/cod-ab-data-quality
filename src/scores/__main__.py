@@ -3,7 +3,7 @@ from logging import getLogger
 from src.config import tables_dir
 from src.utils import read_csv
 
-from . import dates, geometry, languages, output
+from . import columns, dates, geometry, languages, output
 
 logger = getLogger(__name__)
 
@@ -23,7 +23,7 @@ def main() -> None:
     logger.info("Starting")
 
     # NOTE: Register scores here.
-    score_functions = (geometry, languages, dates)
+    score_functions = (geometry, languages, dates, columns)
 
     metadata = read_csv(tables_dir / "metadata.csv")
     checks = read_csv(tables_dir / "checks.csv")
