@@ -23,7 +23,7 @@ def main() -> None:
     logger.info("Starting")
 
     # NOTE: Register scores here.
-    score_functions = (geometry, languages, dates, columns)
+    score_functions = (geometry, columns, languages, dates)
 
     metadata = read_csv(tables_dir / "metadata.csv")
     checks = read_csv(tables_dir / "checks.csv")
