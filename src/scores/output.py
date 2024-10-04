@@ -77,7 +77,6 @@ def aggregate(checks: DataFrame) -> DataFrame:
     """
     checks = checks.drop(columns=["level"])
     checks = checks.groupby("iso3").mean()
-    checks["error_free"] = checks.min(axis=1)
     checks["score"] = checks.mean(axis=1)
     checks = checks.round(3)
     return checks.sort_values(by=["score"])
