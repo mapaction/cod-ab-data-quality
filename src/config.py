@@ -26,11 +26,14 @@ TIMEOUT = int(getenv("TIMEOUT", "60"))
 TIMEOUT_DOWNLOAD = int(getenv("TIMEOUT_DOWNLOAD", "600"))
 ADMIN_LEVELS = int(getenv("ADMIN_LEVELS", "5"))
 
+EPSG_EQUAL_AREA = 6933
 EPSG_WGS84 = 4326
 GEOJSON_PRECISION = 6
 METERS_PER_KM = 1_000_000
 PLOTLY_SIMPLIFY = 0.000_01
 POLYGON = "Polygon"
+SLIVER_GAP_AREA_KM = 0.000_1
+SLIVER_GAP_THINNESS = 0.001
 VALID_GEOMETRY = "Valid Geometry"
 
 # NOTE: Could do more with this type, as iso3 and levels keys are required.

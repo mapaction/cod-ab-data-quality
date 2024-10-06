@@ -13,6 +13,7 @@ from src.utils import get_checks_filter, get_metadata
 from . import (
     dates,
     geometry,
+    geometry_gaps,
     geometry_overlaps_parent,
     geometry_overlaps_self,
     languages,
@@ -67,6 +68,7 @@ def main() -> None:
     # NOTE: Register checks here.
     checks = [
         (geometry, []),
+        (geometry_gaps, []),
         (geometry_overlaps_self, []),
         (geometry_overlaps_parent, []),
         (table_data_completeness, []),

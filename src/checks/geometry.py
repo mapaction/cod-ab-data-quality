@@ -25,10 +25,7 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
     - geom_{min|max}_{x|y}: Gives the bounding box in decimal degrees.
 
     Finally, areas are calculated:
-    - geom_area_km: The sum of individual geometries. Counts overlaped areas twice.
-    - geom_area_km_dissolved: The sum of dissolved geometries. This resolves overlaps.
-    - geom_area_km_overlap: The area of overlapping polygons. Values <= 1e-6 may be
-        false positives. Please rely on `geom_overlaps` for more accurate metrics.
+    - geom_area_km: The sum area of individual geometries.
 
     Args:
         iso3: ISO3 code of the current location being checked.
@@ -47,10 +44,7 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                 for x in gdf.geometry.to_crs(EPSG_WGS84).total_bounds
             ]
             epsg_ease = get_epsg_ease(min_y, max_y)
-            valid = gdf.copy()
-            valid.geometry = valid.geometry.make_valid()
-            area = int(valid.geometry.to_crs(epsg_ease).area.sum())
-            area_dissolved = int(valid.dissolve().to_crs(epsg_ease).area.sum())
+            area = int(gdf.geometry.to_crs(epsg_ease).area.sum())
             invalid_reason = ", ".join(
                 {
                     reason.split("[")[0]
@@ -70,8 +64,6 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                 "geom_max_x": max_x,
                 "geom_max_y": max_y,
                 "geom_area_km": area / METERS_PER_KM,
-                "geom_area_km_dissolved": area_dissolved / METERS_PER_KM,
-                "geom_area_km_overlap": (area - area_dissolved) / METERS_PER_KM,
             }
         check_results.append(row)
     return check_results

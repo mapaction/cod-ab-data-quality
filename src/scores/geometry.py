@@ -1,28 +1,6 @@
 from pandas import DataFrame
 
-from src.config import EPSG_WGS84
-
-
-def score_bounds(checks: DataFrame, scores: DataFrame) -> DataFrame:
-    """Gives a perfect score if all bounds are exactly the same.
-
-    Partial scores are given by the fraction of remaining layers that all share the same
-    bounds.
-
-    Args:
-        checks: checks DataFrame.
-        scores: scores DataFrame.
-
-    Returns:
-        DataFrame with added column for bounds score.
-    """
-    bounds = ["geom_min_x", "geom_min_y", "geom_max_x", "geom_max_y"]
-    summary = checks.copy()
-    summary["bounds"] = checks[bounds].map(str).agg(",".join, axis=1)
-    group = summary[["iso3", "bounds"]].groupby("iso3").agg(["count", "nunique"])
-    group.columns = group.columns.get_level_values(1)
-    group["geometry_bounds"] = (group["count"] - group["nunique"] + 1) / group["count"]
-    return scores.merge(group["geometry_bounds"], on="iso3")
+from src.config import EPSG_WGS84, SLIVER_GAP_AREA_KM, SLIVER_GAP_THINNESS
 
 
 def score_areas(checks: DataFrame, scores: DataFrame) -> DataFrame:
@@ -65,8 +43,15 @@ def main(checks: DataFrame) -> DataFrame:
         & checks["geom_is_xy"]
         & checks["geom_is_valid"]
         & checks["geom_proj"].eq(EPSG_WGS84)
-        & checks["geom_overlaps_self"].eq(0)
     )
-    scores["geometry_hierarchy"] = checks["geom_overlaps_parent"].eq(0)
-    scores = score_bounds(checks, scores)
+    scores["geometry_topology"] = (
+        (
+            checks["geom_gap_area_km"].isna()
+            | checks["geom_gap_area_km"].gt(SLIVER_GAP_AREA_KM)
+            | checks["geom_gap_thinness"].isna()
+            | checks["geom_gap_thinness"].gt(SLIVER_GAP_THINNESS)
+        )
+        & checks["geom_overlaps_self"].eq(0)
+        & checks["geom_overlaps_parent"].eq(0)
+    )
     return score_areas(checks, scores)
