@@ -16,7 +16,7 @@ def score_bounds(checks: DataFrame, scores: DataFrame) -> DataFrame:
     Returns:
         DataFrame with added column for bounds score.
     """
-    bounds = ["geom_min_x", "geom_min_y", "geom_max_x", "geom_max_x"]
+    bounds = ["geom_min_x", "geom_min_y", "geom_max_x", "geom_max_y"]
     summary = checks.copy()
     summary["bounds"] = checks[bounds].map(str).agg(",".join, axis=1)
     group = summary[["iso3", "bounds"]].groupby("iso3").agg(["count", "nunique"])
