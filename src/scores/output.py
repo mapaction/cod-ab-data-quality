@@ -15,7 +15,7 @@ def format_between(
     """Returns a configuration used for conditional formatting between values in Excel.
 
     Args:
-        cell_format: What formatting to apply when the two conditions above are true.
+        cell_format: What formatting to apply when the two conditions below are true.
         min_val: Minimum value for conditional formatting to apply to.
         max_val: Maximum value for conditional formatting to apply to.
 
@@ -31,18 +31,39 @@ def format_between(
     }
 
 
+def format_equals(
+    cell_format: Format,
+    value: str | float,
+) -> dict[str, str | float | Format]:
+    """Returns a configuration used for conditional formatting equal to value in Excel.
+
+    Args:
+        cell_format: What formatting to apply when the condition below are true.
+        value: Value for conditional formatting to apply to.
+
+    Returns:
+        Configuration for Excel conditional formatting.
+    """
+    return {
+        "type": "cell",
+        "criteria": "equal to",
+        "value": value,
+        "format": cell_format,
+    }
+
+
 def style(
     last_row: int,
     last_col: int,
     workbook: Workbook,
     worksheet: Worksheet,
 ) -> None:
-    """Apply red / amber / green styling to excel values that fall between value ranges.
+    """Apply red / orange / yellow styling to excel values falling between value ranges.
 
     - Decimals are formatted as percentages.
     - Red formatting is applied for values: 0-33%
-    - Yellow formatting is applied for values: 33-66%
-    - Green formatting is applied for values: 66-100%
+    - Orange formatting is applied for values: 33-67%
+    - Yellow formatting is applied for values: 67-100%
 
     Args:
         last_row: Index of last row in Excel (0-indexed).
@@ -51,7 +72,8 @@ def style(
         worksheet: Excel worksheet instance.
     """
     first_row = 1
-    first_col = 2
+    status_col = 2
+    first_col = 3
     format_percent = workbook.add_format({"num_format": "0%"})
     format_rd = workbook.add_format({"bg_color": "#FFC7CE", "font_color": "#9C0006"})
     format_or = workbook.add_format({"bg_color": "#FFCC99", "font_color": "#3F3F76"})
@@ -59,10 +81,14 @@ def style(
     between_rd = format_between(format_rd, 0, 0.333)
     between_or = format_between(format_or, 0.333, 0.667)
     between_yl = format_between(format_yl, 0.667, 0.999)
+    equal_rd = format_equals(format_rd, '"Not Available"')
+    equal_or = format_equals(format_or, '"Standard"')
     worksheet.set_column(first_col, last_col, None, format_percent)
     worksheet.conditional_format(first_row, first_col, last_row, last_col, between_rd)
     worksheet.conditional_format(first_row, first_col, last_row, last_col, between_or)
     worksheet.conditional_format(first_row, first_col, last_row, last_col, between_yl)
+    worksheet.conditional_format(first_row, status_col, last_row, status_col, equal_rd)
+    worksheet.conditional_format(first_row, status_col, last_row, status_col, equal_or)
     worksheet.autofit()
 
 
@@ -77,7 +103,6 @@ def aggregate(checks: DataFrame) -> DataFrame:
     """
     checks = checks.drop(columns=["level"])
     checks = checks.groupby("iso3").mean()
-    checks["error_free"] = checks.min(axis=1)
     checks["score"] = checks.mean(axis=1)
     checks = checks.round(3)
     return checks.sort_values(by=["score"])
