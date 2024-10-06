@@ -15,9 +15,8 @@ def main(checks: DataFrame) -> DataFrame:
         Checks DataFrame with additional columns for scoring.
     """
     scores = checks[["iso3", "level"]].copy()
-    scores["dates"] = (
-        checks["date_count"].eq(1)
-        & checks["update_count"].eq(1)
-        & checks["update_1"].gt(Timestamp.now() - relativedelta(years=1))
+    scores["date"] = checks["date_count"].eq(1)
+    scores["valid_on"] = checks["update_count"].eq(1) & checks["update_1"].gt(
+        Timestamp.now() - relativedelta(years=1),
     )
     return scores
