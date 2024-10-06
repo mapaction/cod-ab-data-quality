@@ -1,6 +1,7 @@
 from re import compile
 
 from geopandas import GeoDataFrame
+from langcodes import Language
 
 from src.config import CheckReturnList
 
@@ -29,7 +30,12 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
     """
     check_results = []
     for admin_level, gdf in enumerate(gdfs):
-        row = {"iso3": iso3, "level": admin_level, "language_count": 0}
+        row = {
+            "iso3": iso3,
+            "level": admin_level,
+            "language_count": 0,
+            "language_invalid": 0,
+        }
         columns = list(gdf.columns)
         p = compile(rf"^ADM{admin_level}_\w{{2}}$")
         langs = [x.split("_")[1].lower() for x in columns if p.search(x)]
@@ -37,5 +43,7 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
         for index, lang in enumerate(langs):
             row["language_count"] += 1
             row[f"language_{index+1}"] = lang
+            if not Language.get(lang).is_valid():
+                row["language_invalid"] += 1
         check_results.append(row)
     return check_results

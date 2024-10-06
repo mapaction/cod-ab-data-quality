@@ -42,31 +42,9 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                     for level in range(admin_level + 1)
                 ],
             ),
-            "levels_with_reference_name": sum(
-                [
-                    any(column == f"ADM{level}_REF" for column in gdf.columns)
-                    for level in range(admin_level + 1)
-                ],
-            ),
-            "levels_with_alternative_name": sum(
-                [
-                    any(
-                        bool(match(rf"^ADM{level}ALT[1-2]_[A-Z][A-Z]$", column))
-                        for column in gdf.columns
-                    )
-                    for level in range(admin_level + 1)
-                ],
-            ),
             "name_count": sum(
                 [
                     bool(match(rf"^ADM{level}_[A-Z][A-Z]$", column))
-                    for column in gdf.columns
-                    for level in range(admin_level + 1)
-                ],
-            ),
-            "alternative_name_count": sum(
-                [
-                    bool(match(rf"^ADM{level}ALT[1-2]_[A-Z][A-Z]$", column))
                     for column in gdf.columns
                     for level in range(admin_level + 1)
                 ],

@@ -133,14 +133,13 @@ def get_epsg_ease(min_lat: float, max_lat: float) -> Literal[6931, 6932, 6933]:
         EPSG for global EASE grid if area touches neither or both poles, otherwise a
         north or south grid if the area touches either of those zones.
     """
-    latitude_limit = 80
+    latitude_poles = 80
+    latitude_equator = 0
     epsg_ease_north = 6931
     epsg_ease_south = 6932
     epsg_ease_global = 6933
-    if max_lat >= latitude_limit and min_lat <= -latitude_limit:
-        return epsg_ease_global
-    if max_lat >= latitude_limit:
+    if max_lat >= latitude_poles and min_lat >= latitude_equator:
         return epsg_ease_north
-    if min_lat <= -latitude_limit:
+    if min_lat <= -latitude_poles and max_lat <= latitude_equator:
         return epsg_ease_south
     return epsg_ease_global

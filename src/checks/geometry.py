@@ -59,8 +59,9 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                 },
             )
             row |= {
+                "geom_not_empty": ~(gdf.geometry.is_empty | gdf.geometry.isna()).any(),
                 "geom_is_polygon": gdf.geometry.geom_type.str.contains(POLYGON).all(),
-                "geom_is_xy": not gdf.geometry.has_z.any(),
+                "geom_is_xy": ~gdf.geometry.has_z.any(),
                 "geom_is_valid": gdf.geometry.is_valid.all(),
                 "geom_invalid_reason": invalid_reason,
                 "geom_proj": gdf.geometry.crs.to_epsg(),
