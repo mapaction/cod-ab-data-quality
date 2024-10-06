@@ -138,7 +138,7 @@ def main(metadata: DataFrame, checks: DataFrame) -> None:
         )
         .fillna("Not Available")
     )
-    scores = scores.sort_values(by=["score"], na_position="first")
+    scores = scores.fillna(0).sort_values(by=["score"])
     with ExcelWriter(tables_dir / "cod_ab_data_quality.xlsx") as writer:
         scores.to_excel(writer, sheet_name="cod_ab_data_quality", index=False)
         if isinstance(writer.book, Workbook):
