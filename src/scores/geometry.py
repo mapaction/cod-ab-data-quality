@@ -42,6 +42,10 @@ def main(checks: DataFrame) -> DataFrame:
         & checks["geom_is_polygon"]
         & checks["geom_is_xy"]
         & checks["geom_is_valid"]
+        & checks["geom_min_x"].ge(-180)
+        & checks["geom_min_y"].ge(-90)
+        & checks["geom_max_x"].le(180)
+        & checks["geom_max_y"].le(90)
         & checks["geom_proj"].eq(EPSG_WGS84)
     )
     scores["geometry_topology"] = (
