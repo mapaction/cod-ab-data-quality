@@ -1,9 +1,26 @@
+from math import inf
 from re import compile
 
 from geopandas import GeoDataFrame
 from langcodes import Language
 
 from src.config import CheckReturnList
+
+
+def get_langs(gdf: GeoDataFrame, admin_level: int) -> list[str]:
+    """Gets a list of language codes.
+
+    Args:
+        gdf: Current layer's GeoDataFrame.
+        admin_level: Current layer's admin level.
+
+    Returns:
+        _description_
+    """
+    columns = list(gdf.columns)
+    p = compile(rf"^ADM{admin_level}_\w{{2}}$")
+    langs = [x.split("_")[1].lower() for x in columns if p.search(x)]
+    return list(dict.fromkeys(langs))
 
 
 def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
@@ -29,17 +46,22 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
         List of results to output as a CSV.
     """
     check_results = []
+    language_min = inf
+    language_max = -inf
+    for admin_level, gdf in enumerate(gdfs):
+        langs = get_langs(gdf, admin_level)
+        language_min = min(language_min, len(langs))
+        language_max = max(language_max, len(langs))
     for admin_level, gdf in enumerate(gdfs):
         row = {
             "iso3": iso3,
             "level": admin_level,
+            "language_min": language_min,
+            "language_max": language_max,
             "language_count": 0,
             "language_invalid": 0,
         }
-        columns = list(gdf.columns)
-        p = compile(rf"^ADM{admin_level}_\w{{2}}$")
-        langs = [x.split("_")[1].lower() for x in columns if p.search(x)]
-        langs = list(dict.fromkeys(langs))
+        langs = get_langs(gdf, admin_level)
         for index, lang in enumerate(langs):
             row["language_count"] += 1
             row[f"language_{index+1}"] = lang
