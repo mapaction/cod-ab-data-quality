@@ -13,7 +13,10 @@ def score_validity(checks: DataFrame) -> Series:
         Data Series for validity score.
     """
     return (
-        checks["geom_count"].gt(0)
+        (
+            checks["level"].eq(0) & checks["geom_count"].eq(1)
+            | checks["level"].gt(0) & checks["geom_count"].gt(0)
+        )
         & checks["geom_empty"].eq(0)
         & checks["geom_not_polygon"].eq(0)
         & checks["geom_has_z"].eq(0)
