@@ -1,6 +1,54 @@
-from pandas import DataFrame
+from pandas import DataFrame, Series
 
 from src.config import EPSG_WGS84, SLIVER_GAP_AREA_KM, SLIVER_GAP_THINNESS
+
+
+def score_validity(checks: DataFrame) -> Series:
+    """Gives a perfect score if all validity conditions are true.
+
+    Args:
+        checks: checks DataFrame.
+
+    Returns:
+        Data Series for validity score.
+    """
+    return (
+        checks["geom_count"].gt(0)
+        & checks["geom_empty"].eq(0)
+        & checks["geom_not_polygon"].eq(0)
+        & checks["geom_has_z"].eq(0)
+        & checks["geom_invalid"].eq(0)
+        & checks["geom_proj"].eq(EPSG_WGS84)
+        & checks["geom_min_x"].ge(-180)
+        & checks["geom_min_y"].ge(-90)
+        & checks["geom_max_x"].le(180)
+        & checks["geom_max_y"].le(90)
+    )
+
+
+def score_topology(checks: DataFrame) -> Series:
+    """Gives a perfect score if all topology conditions are true.
+
+    Args:
+        checks: checks DataFrame.
+
+    Returns:
+        Data Series for topology score.
+    """
+    return (
+        (
+            checks["geom_gap_area_km"].isna()
+            | checks["geom_gap_area_km"].gt(SLIVER_GAP_AREA_KM)
+            | checks["geom_gap_thinness"].isna()
+            | checks["geom_gap_thinness"].gt(SLIVER_GAP_THINNESS)
+        )
+        & checks["geom_overlaps_self"].eq(0)
+        & checks["geom_not_within_parent"].eq(0)
+        & (
+            checks["geom_not_within_pcode"].isna()
+            | checks["geom_not_within_pcode"].eq(0)
+        )
+    )
 
 
 def score_areas(checks: DataFrame, scores: DataFrame) -> DataFrame:
@@ -26,8 +74,7 @@ def main(checks: DataFrame) -> DataFrame:
     """Creates scores based on geometry.
 
     - geometry_valid: scores based on whether each layer has valid geometry.
-    - geometry_hierarchy: scores based on whether each layer nests perfectly to parents.
-    - geometry_bounds: scores based on whether each layer has the same bounds.
+    - geometry_hierarchy: scores based on whether layer has valid topology.
     - geometry_areas: scores based on whether each layer has the same area.
 
     Args:
@@ -37,29 +84,6 @@ def main(checks: DataFrame) -> DataFrame:
         DataFrame with columns for scoring.
     """
     scores = checks[["iso3", "level"]].copy()
-    scores["geometry_valid"] = (
-        checks["geom_not_empty"]
-        & checks["geom_is_polygon"]
-        & checks["geom_is_xy"]
-        & checks["geom_is_valid"]
-        & checks["geom_min_x"].ge(-180)
-        & checks["geom_min_y"].ge(-90)
-        & checks["geom_max_x"].le(180)
-        & checks["geom_max_y"].le(90)
-        & checks["geom_proj"].eq(EPSG_WGS84)
-    )
-    scores["geometry_topology"] = (
-        (
-            checks["geom_gap_area_km"].isna()
-            | checks["geom_gap_area_km"].gt(SLIVER_GAP_AREA_KM)
-            | checks["geom_gap_thinness"].isna()
-            | checks["geom_gap_thinness"].gt(SLIVER_GAP_THINNESS)
-        )
-        & checks["geom_overlaps_self"].eq(0)
-        & checks["geom_not_within_parent"].eq(0)
-        & (
-            checks["geom_not_within_pcode"].isna()
-            | checks["geom_not_within_pcode"].eq(0)
-        )
-    )
+    scores["geometry_valid"] = score_validity(checks)
+    scores["geometry_topology"] = score_topology(checks)
     return score_areas(checks, scores)
