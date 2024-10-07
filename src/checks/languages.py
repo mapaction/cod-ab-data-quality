@@ -49,9 +49,13 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
     language_min = inf
     language_max = -inf
     for admin_level, gdf in enumerate(gdfs):
-        langs = get_langs(gdf, admin_level)
-        language_min = min(language_min, len(langs))
-        language_max = max(language_max, len(langs))
+        lang_count = len(get_langs(gdf, admin_level))
+        if lang_count:
+            language_min = min(language_min, lang_count)
+            language_max = max(language_max, lang_count)
+    if language_min == inf:
+        language_min = None
+        language_max = None
     for admin_level, gdf in enumerate(gdfs):
         row = {
             "iso3": iso3,
