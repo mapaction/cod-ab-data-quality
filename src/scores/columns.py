@@ -15,6 +15,6 @@ def main(checks: DataFrame) -> DataFrame:
         checks["levels_with_data"].eq(checks["level"] + 1)
         & checks["levels_with_name"].eq(checks["level"] + 1)
         & checks["levels_with_pcode"].eq(checks["level"] + 1)
-        & checks["name_count"].eq(checks["language_count"] * (checks["level"] + 1))
+        & checks["name_count"].ge(checks["language_count"] * (checks["level"] + 1))
     )
     return scores.drop(columns=["language_count"])
