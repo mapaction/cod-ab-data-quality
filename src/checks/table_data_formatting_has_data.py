@@ -27,18 +27,18 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                     for level in range(admin_level + 1)
                 ],
             ),
+            "levels_with_pcode": sum(
+                [
+                    any(column == f"ADM{level}_PCODE" for column in gdf.columns)
+                    for level in range(admin_level + 1)
+                ],
+            ),
             "levels_with_name": sum(
                 [
                     any(
                         bool(match(rf"^ADM{level}_[A-Z][A-Z]$", column))
                         for column in gdf.columns
                     )
-                    for level in range(admin_level + 1)
-                ],
-            ),
-            "levels_with_pcode": sum(
-                [
-                    any(column == f"ADM{level}_PCODE" for column in gdf.columns)
                     for level in range(admin_level + 1)
                 ],
             ),
