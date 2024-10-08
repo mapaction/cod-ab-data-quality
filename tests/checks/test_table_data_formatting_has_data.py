@@ -1,6 +1,6 @@
 from geopandas import GeoDataFrame
 
-from src.checks.table_data_formatting_has_data import main
+from src.checks.table_pcodes import main
 
 
 def test_table_data_formatting_has_data(iso3: str, gdfs: list[GeoDataFrame]) -> None:

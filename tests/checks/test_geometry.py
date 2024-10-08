@@ -1,7 +1,7 @@
 import pytest
 from geopandas import GeoDataFrame
 
-from src.checks.geometry import main
+from src.checks.geometry_valid import main
 
 
 @pytest.mark.slow

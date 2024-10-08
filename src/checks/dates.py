@@ -30,13 +30,11 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
     for admin_level, gdf in enumerate(gdfs):
         row = {"iso3": iso3, "level": admin_level, "date_count": 0, "update_count": 0}
         try:
-            gdf_date = gdf[~gdf["date"].isna()]["date"].dt.date.drop_duplicates()
+            gdf_date = gdf["date"].dt.date.drop_duplicates()
             for index, value in enumerate(gdf_date):
                 row["date_count"] += 1
                 row[f"date_{index+1}"] = value
-            gdf_update = gdf[~gdf["validOn"].isna()][
-                "validOn"
-            ].dt.date.drop_duplicates()
+            gdf_update = gdf["validOn"].dt.date.drop_duplicates()
             for index, value in enumerate(gdf_update):
                 row["update_count"] += 1
                 row[f"update_{index+1}"] = value

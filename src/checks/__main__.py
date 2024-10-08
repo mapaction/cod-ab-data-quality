@@ -12,13 +12,13 @@ from src.utils import get_checks_filter, get_metadata
 
 from . import (
     dates,
-    geometry,
     geometry_gaps,
     geometry_overlaps_self,
+    geometry_valid,
     geometry_within_parent,
     languages,
-    table_data_completeness,
-    table_data_formatting_has_data,
+    table_names,
+    table_pcodes,
 )
 
 logger = getLogger(__name__)
@@ -67,14 +67,14 @@ def main() -> None:
 
     # NOTE: Register checks here.
     checks = [
-        (geometry, []),
+        (geometry_valid, []),
         (geometry_gaps, []),
         (geometry_overlaps_self, []),
         (geometry_within_parent, []),
-        (table_data_completeness, []),
+        (table_pcodes, []),
+        (table_names, []),
         (dates, []),
         (languages, []),
-        (table_data_formatting_has_data, []),
     ]
 
     checks = filter_checks(checks)
