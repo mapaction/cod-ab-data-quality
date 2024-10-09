@@ -2,7 +2,7 @@ from math import inf
 from re import compile
 
 from geopandas import GeoDataFrame
-from langcodes import Language
+from pycountry import languages
 
 from src.config import CheckReturnList
 
@@ -69,7 +69,7 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
         for index, lang in enumerate(langs):
             row["language_count"] += 1
             row[f"language_{index+1}"] = lang
-            if not Language.get(lang).is_valid():
+            if not languages.get(alpha_2=lang):
                 row["language_invalid"] += 1
         check_results.append(row)
     return check_results

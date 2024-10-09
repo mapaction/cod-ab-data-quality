@@ -16,6 +16,6 @@ def main(checks: DataFrame) -> DataFrame:
         & checks["name_column_count"].ge(
             checks["language_count"] * (checks["level"] + 1),
         )
-        & checks["name_cell_empty"].eq(0)
+        & checks["name_empty"].eq(0)
     )
     return scores

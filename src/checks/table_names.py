@@ -25,6 +25,7 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
             for level in range(admin_level + 1)
             if match(rf"^ADM{level}_[A-Z][A-Z]$", column)
         ]
+        names = gdf[name_columns]
         row = {
             "iso3": iso3,
             "level": admin_level,
@@ -38,16 +39,8 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                 ],
             ),
             "name_column_count": len(name_columns),
-            "name_cell_empty": sum(
-                [
-                    (gdf[column].isna() | gdf[column].map(is_empty)).sum()
-                    for column in name_columns
-                ],
-            ),
-            "name_cell_count": max(
-                sum([gdf[column].size for column in name_columns]),
-                1,
-            ),
+            "name_cell_count": max(names.size, 1),
+            "name_empty": (names.isna() | names.map(is_empty)).sum().sum(),
         }
         check_results.append(row)
     return check_results
