@@ -21,6 +21,9 @@ def main() -> None:
     - module: scores
         - depends: data/tables/metadata.csv, data/tables/checks.csv
         - outputs: data/tables/scores.csv
+    - module: images
+        - depends: data/tables/metadata.csv, data/boundaries/*.gpkg
+        - outputs: data/images/*.png
     """
     metadata()
     download()

@@ -40,20 +40,27 @@ scores:
 	@echo "Calculating scores"
 	@poetry run python -m src.scores
 
+images:
+	@echo "Generating images"
+	@poetry run python -m src.images
+
 run:
 	@echo "Running all commands"
 	@poetry run python -m src
 
 help:
-	@echo "Available make targets:"
+	@echo "Available make commands for setup:"
 	@echo " make help           - Print help"
 	@echo " make .venv          - Install project dependencies"
 	@echo " make hooks          - Add pre-commit hooks"
 	@echo " make test           - Run unit tests"
 	@echo " make lint           - Run lint tests"
 	@echo " make clean          - Remove .venv"
+	@echo ""
+	@echo "Available make commands for pipeline:"
 	@echo " make metadata       - Generate metadata"
 	@echo " make download       - Download boundaries"
-	@echo " make checks       	- Run checks"
-	@echo " make scores       	- Calculate scores"
-	@echo " make run       		- Run all commands"
+	@echo " make checks         - Run checks"
+	@echo " make scores         - Calculate scores"
+	@echo " make images         - Generate images"
+	@echo " make run            - Run all commands"

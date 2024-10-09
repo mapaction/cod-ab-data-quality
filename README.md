@@ -83,6 +83,7 @@ cp .env.example .env
 ### Running commands
 
 Most commands can be accessed through `make`.
+For a list of all available commands: `make help`.
 In particular, `make run` will run all commands of this project in sequence.
 
 Alternatively, `make run` can be run through the Docker command:

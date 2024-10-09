@@ -1,4 +1,5 @@
 from logging import getLogger
+from multiprocessing import Pool
 from typing import Any
 
 from geopandas import GeoDataFrame, read_file
@@ -11,12 +12,13 @@ from src.utils import get_checks_filter, get_metadata
 
 from . import (
     dates,
-    geometry,
-    geometry_hierarchy,
-    geometry_overlaps,
+    geometry_gaps,
+    geometry_overlaps_self,
+    geometry_valid,
+    geometry_within_parent,
     languages,
-    table_data_completeness,
-    table_data_formatting_has_data,
+    table_names,
+    table_pcodes,
 )
 
 logger = getLogger(__name__)
@@ -65,13 +67,14 @@ def main() -> None:
 
     # NOTE: Register checks here.
     checks = [
-        (geometry, []),
-        (geometry_overlaps, []),
-        (geometry_hierarchy, []),
-        (table_data_completeness, []),
+        (geometry_valid, []),
+        (geometry_gaps, []),
+        (geometry_overlaps_self, []),
+        (geometry_within_parent, []),
+        (table_pcodes, []),
+        (table_names, []),
         (dates, []),
         (languages, []),
-        (table_data_formatting_has_data, []),
     ]
 
     checks = filter_checks(checks)
@@ -91,12 +94,16 @@ def main() -> None:
             except DataSourceError:
                 gdf = GeoDataFrame()
             gdfs.append(gdf)
-        for function, results in checks:
-            rows = function.main(iso3, gdfs)
-            results.extend(rows)
+        with Pool() as pool:
+            for function, results in checks:
+                result = pool.apply_async(function.main, args=[iso3, gdfs])
+                results.append(result)
+            pool.close()
+            pool.join()
     output = None
     for _, results in checks:
-        partial = DataFrame(results).convert_dtypes()
+        rows = [row for result in results for row in result.get()]
+        partial = DataFrame(rows).convert_dtypes()
         if output is None:
             output = partial
         else:

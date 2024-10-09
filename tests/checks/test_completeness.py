@@ -1,6 +1,6 @@
 from geopandas import GeoDataFrame
 
-from src.checks.table_data_completeness import main
+from src.checks.table_names import main
 
 
 def test_mdg_completeness(iso3: str, gdfs: list[GeoDataFrame]) -> None:

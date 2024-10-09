@@ -16,6 +16,7 @@ RUN poetry install --no-root --no-dev --no-cache
 ENV PATH="/usr/src/app/.venv/bin:$PATH"
 
 COPY data/boundaries/.gitignore ./data/boundaries/.gitignore
+COPY data/images/.gitignore ./data/images/.gitignore
 COPY data/tables/.gitignore ./data/tables/.gitignore
 COPY src ./src
 
