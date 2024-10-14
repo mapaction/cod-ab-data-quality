@@ -40,9 +40,9 @@ scores:
 	@echo "Calculating scores"
 	@poetry run python -m src.scores
 
-images:
-	@echo "Generating images"
-	@poetry run python -m src.images
+reports:
+	@echo "Generating report content"
+	@poetry run python -m src.reports
 
 run:
 	@echo "Running all commands"
@@ -62,5 +62,5 @@ help:
 	@echo " make download       - Download boundaries"
 	@echo " make checks         - Run checks"
 	@echo " make scores         - Calculate scores"
-	@echo " make images         - Generate images"
+	@echo " make reports        - Generate report content"
 	@echo " make run            - Run all commands"

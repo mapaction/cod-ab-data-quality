@@ -20,11 +20,25 @@ getLogger("pyogrio._io").setLevel(WARNING)
 environ["OGR_GEOJSON_MAX_OBJ_SIZE"] = "0"
 environ["OGR_ORGANIZE_POLYGONS"] = "ONLY_CCW"
 
+
+def is_bool(value: str) -> bool:
+    """Converts string option on env variable to boolean.
+
+    Args:
+        value: env varable.
+
+    Returns:
+        True if string is truthy.
+    """
+    return value.lower() in ["yes", "on", "true", "1"]
+
+
 ATTEMPT = int(getenv("ATTEMPT", "5"))
 WAIT = int(getenv("WAIT", "10"))
 TIMEOUT = int(getenv("TIMEOUT", "60"))
 TIMEOUT_DOWNLOAD = int(getenv("TIMEOUT_DOWNLOAD", "600"))
 ADMIN_LEVELS = int(getenv("ADMIN_LEVELS", "5"))
+MULTIPROCESSING = not is_bool(getenv("MULTIPROCESSING_DISABLED", "NO"))
 
 EPSG_EQUAL_AREA = 6933
 EPSG_WGS84 = 4326
@@ -42,6 +56,8 @@ type CheckReturnList = list[dict[str, Any]]
 cwd = Path(__file__).parent
 boundaries_dir = cwd / "../data/boundaries"
 boundaries_dir.mkdir(parents=True, exist_ok=True)
+attributes_dir = cwd / "../data/attributes"
+attributes_dir.mkdir(parents=True, exist_ok=True)
 images_dir = cwd / "../data/images"
 images_dir.mkdir(parents=True, exist_ok=True)
 tables_dir = cwd / "../data/tables"

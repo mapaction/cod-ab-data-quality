@@ -1,16 +1,14 @@
-from contextlib import suppress
 from logging import getLogger
 
 from geopandas import read_file
 from plotly.graph_objects import Choropleth, Figure
-from pyogrio.errors import DataSourceError
 
 from src.config import EPSG_WGS84, PLOTLY_SIMPLIFY, boundaries_dir, images_dir
 
 logger = getLogger(__name__)
 
 
-def create_image(iso3: str, level: int) -> None:
+def create_png(iso3: str, level: int) -> None:
     """Creates a PNG for an admin boundary.
 
     Args:
@@ -18,7 +16,7 @@ def create_image(iso3: str, level: int) -> None:
         level: Admin level of boundary.
     """
     file = boundaries_dir / f"{iso3.lower()}_adm{level}.gpkg"
-    with suppress(DataSourceError):
+    if file.exists():
         gdf = read_file(file, use_arrow=True).to_crs(EPSG_WGS84)
         gdf = gdf[~gdf.geometry.is_empty]
         gdf.geometry = gdf.geometry.simplify(PLOTLY_SIMPLIFY)

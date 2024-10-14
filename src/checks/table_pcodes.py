@@ -23,6 +23,11 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
             return not value.startswith(iso.alpha_2)
         return False
 
+    def not_alnum(value: str | None) -> bool:
+        if value and value.strip():
+            return not value.isalnum()
+        return False
+
     check_results = []
     for admin_level, gdf in enumerate(gdfs):
         pcode_columns = [
@@ -39,6 +44,7 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
             "pcode_cell_count": max(pcodes.size, 1),
             "pcode_empty": (pcodes.isna() | pcodes.map(is_empty)).sum().sum(),
             "pcode_not_iso2": pcodes.map(not_iso2).sum().sum(),
+            "pcode_not_alnum": pcodes.map(not_alnum).sum().sum(),
             "pcode_not_nested": 0,
         }
         pcode_self = f"ADM{admin_level}_PCODE"

@@ -3,13 +3,14 @@ from multiprocessing import Pool
 
 from src.utils import get_metadata
 
-from .image import create_image
+from .attribute import create_csv
+from .image import create_png
 
 logger = getLogger(__name__)
 
 
 def main() -> None:
-    """Create an image for each administrative boundary layer."""
+    """Create a csv and image for each administrative boundary layer."""
     logger.info("Starting")
     metadata = get_metadata()
     results = []
@@ -20,7 +21,8 @@ def main() -> None:
             if levels is None:
                 levels = -1
             for level in range(levels + 1):
-                result = pool.apply_async(create_image, args=[iso3, level])
+                result = pool.apply_async(create_png, args=[iso3, level])
+                result = pool.apply_async(create_csv, args=[iso3, level])
                 results.append(result)
         pool.close()
         pool.join()
