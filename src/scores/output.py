@@ -60,6 +60,10 @@ def style(
 ) -> None:
     """Apply red / orange / yellow styling to excel values falling between value ranges.
 
+    The first few columns of the output include location names and iso3 codes.
+    - status_col: zero-index location of the COD status (Enhanced / Standard)
+    - first_col: zero-index location where decimal data begins.
+
     - Decimals are formatted as percentages.
     - Red formatting is applied for values: 0-33%
     - Orange formatting is applied for values: 33-67%
