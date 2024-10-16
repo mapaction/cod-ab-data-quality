@@ -14,6 +14,7 @@ version = "0.1.0"
 geopandas = "^1.0.1"
 httpx = { version = "^0.27.2", extras = ["http2"] }
 kaleido = "0.2.1"
+langcodes = "^3.4.1"
 pandas = { version = "^2.2.3", extras = ["excel", "performance"] }
 plotly = "^5.24.1"
 pyarrow = "^17.0.0"
