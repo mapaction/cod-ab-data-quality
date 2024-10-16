@@ -3,7 +3,7 @@ from logging import getLogger
 from src.config import tables_dir
 from src.utils import read_csv
 
-from . import dates, languages, output
+from . import columns, dates, geometry, languages, output
 
 logger = getLogger(__name__)
 
@@ -23,12 +23,13 @@ def main() -> None:
     logger.info("Starting")
 
     # NOTE: Register scores here.
-    score_functions = (languages, dates)
+    score_functions = (geometry, columns, languages, dates)
 
-    df_checks = read_csv(tables_dir / "checks.csv")
+    metadata = read_csv(tables_dir / "metadata.csv")
+    checks = read_csv(tables_dir / "checks.csv")
     score_results = []
     for function in score_functions:
-        partial = function.main(df_checks)
+        partial = function.main(checks)
         score_results.append(partial)
     output_table = None
     for partial in score_results:
@@ -41,7 +42,7 @@ def main() -> None:
                 how="outer",
             )
     if output_table is not None:
-        output.main(output_table)
+        output.main(metadata, output_table)
     logger.info("Finished")
 
 

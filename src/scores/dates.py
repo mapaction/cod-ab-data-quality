@@ -2,15 +2,22 @@ from dateutil.relativedelta import relativedelta
 from pandas import DataFrame, Timestamp
 
 
-def main(df: DataFrame) -> DataFrame:
-    """Draft function for scoring date values within dataset.
+def main(checks: DataFrame) -> DataFrame:
+    """Function for scoring date values within dataset.
+
+    Gives a perfect score if there is only one date value for the "date" and "validOn"
+    columns, as well as whether the "validOn" column is less than 1 year. OCHA conducts
+    an annual COD review process where datasets should be validated on a 12 month cycle.
 
     Args:
-        df: checks DataFrame.
+        checks: checks DataFrame.
 
     Returns:
         Checks DataFrame with additional columns for scoring.
     """
-    df_score = df[["iso3", "level"]].copy()
-    df_score["dates"] = df["update_1"] > Timestamp.now() - relativedelta(years=3)
-    return df_score
+    scores = checks[["iso3", "level"]].copy()
+    scores["date"] = checks["date_count"].eq(1)
+    scores["valid_on"] = checks["update_count"].eq(1) & checks["update_1"].gt(
+        Timestamp.now() - relativedelta(years=1),
+    )
+    return scores

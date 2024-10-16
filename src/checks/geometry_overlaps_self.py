@@ -20,10 +20,13 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
     """
     check_results = []
     for admin_level, gdf in enumerate(gdfs):
-        row = {"iso3": iso3, "level": admin_level}
         if gdf.active_geometry_name:
             overlaps = gdf.sjoin(gdf, predicate="overlaps")
             overlap_count = len(overlaps[overlaps.index != overlaps.index_right].index)
-            row |= {"geom_overlaps": overlap_count / 2}
-        check_results.append(row)
+            row = {
+                "iso3": iso3,
+                "level": admin_level,
+                "geom_overlaps_self": overlap_count / 2,
+            }
+            check_results.append(row)
     return check_results
