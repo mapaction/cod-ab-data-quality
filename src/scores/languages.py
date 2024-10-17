@@ -14,9 +14,7 @@ def main(checks: DataFrame) -> DataFrame:
         Checks DataFrame with additional columns for scoring.
     """
     scores = checks[["iso3", "level"]].copy()
-    scores["languages"] = (
-        checks["language_count"].gt(0)
-        & checks["language_count"].eq(checks["language_min"])
-        & checks["language_invalid"].eq(0)
-    )
+    scores["languages"] = checks["language_count"].gt(0) & checks[
+        "language_invalid"
+    ].eq(0)
     return scores
