@@ -143,3 +143,15 @@ def get_epsg_ease(min_lat: float, max_lat: float) -> Literal[6931, 6932, 6933]:
     if min_lat <= -latitude_poles and max_lat <= latitude_equator:
         return epsg_ease_south
     return epsg_ease_global
+
+
+def is_empty(string: str) -> bool:
+    """Checks if string is empty.
+
+    Args:
+        string: Any valid string.
+
+    Returns:
+        True if string is only whitespace.
+    """
+    return str(string).strip() == ""
