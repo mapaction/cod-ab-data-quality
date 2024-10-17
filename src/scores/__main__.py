@@ -4,12 +4,13 @@ from src.config import tables_dir
 from src.utils import read_csv
 
 from . import (
-    dates,
     geometry_areas,
     geometry_topology,
     geometry_validity,
-    languages,
     output,
+    table_areas,
+    table_dates,
+    table_languages,
     table_names,
     table_pcodes,
 )
@@ -38,8 +39,9 @@ def main() -> None:
         geometry_areas,
         table_pcodes,
         table_names,
-        languages,
-        dates,
+        table_languages,
+        table_dates,
+        table_areas,
     )
 
     metadata = read_csv(tables_dir / "metadata.csv")

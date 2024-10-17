@@ -88,6 +88,48 @@ def is_upper(name: str | None) -> bool:
     return name == name.upper() and name.lower() != name.upper()
 
 
+def is_lower(name: str | None) -> bool:
+    """Checks if name is all lowercase.
+
+    Args:
+        name: Name string.
+
+    Returns:
+        True if name is all lowercase.
+    """
+    if not name or not name.strip():
+        return False
+    return name == name.lower() and name.lower() != name.upper()
+
+
+def has_strippable_spaces(name: str | None) -> bool:
+    """Checks if string has strippable spaces.
+
+    Args:
+        name: string.
+
+    Returns:
+        True if name has leading or trailing spaces.
+    """
+    if not name or not name.strip():
+        return False
+    return name != name.strip()
+
+
+def has_double_spaces(name: str | None) -> bool:
+    """Checks if string has double spaces.
+
+    Args:
+        name: string.
+
+    Returns:
+        True if name has double spaces.
+    """
+    if not name or not name.strip():
+        return False
+    return "  " in name
+
+
 def is_punctuation(column: str, name: str | None) -> bool:
     """Check if a value within a column is a valid name based on it's language code.
 
@@ -193,8 +235,17 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
             "name_column_count": len(name_columns),
             "name_cell_count": max(names.size, 1),
             "name_empty": (names.isna() | names.map(is_empty)).sum().sum(),
+            "name_spaces_strip": sum(
+                [names[col].map(has_strippable_spaces).sum() for col in name_columns],
+            ),
+            "name_spaces_double": sum(
+                [names[col].map(has_double_spaces).sum() for col in name_columns],
+            ),
             "name_upper": sum(
                 [names[col].map(is_upper).sum() for col in name_columns],
+            ),
+            "name_lower": sum(
+                [names[col].map(is_lower).sum() for col in name_columns],
             ),
             "name_no_valid": sum(
                 [

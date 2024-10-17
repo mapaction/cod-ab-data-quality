@@ -72,5 +72,7 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                 "geom_max_y": max_y,
                 "geom_area_km": area / METERS_PER_KM,
             }
+            if "AREA_SQKM" in gdf.columns:
+                row["geom_area_km_attr"] = gdf["AREA_SQKM"].sum()
         check_results.append(row)
     return check_results
