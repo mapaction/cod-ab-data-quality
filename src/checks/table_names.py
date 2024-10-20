@@ -2,7 +2,7 @@ from re import match
 
 from geopandas import GeoDataFrame
 from icu import USET_ADD_CASE_MAPPINGS, LocaleData, ULocaleDataExemplarSetType
-from pycountry import languages
+from langcodes import tag_is_valid
 
 from src.config import CheckReturnList
 from src.utils import is_empty
@@ -142,7 +142,7 @@ def is_punctuation(column: str, name: str | None) -> bool:
         character set.
     """
     lang = column.split("_")[1].lower()
-    if not name or not name.strip() or not languages.get(alpha_2=lang):
+    if not name or not name.strip() or not tag_is_valid(lang):
         return False
     char_set = get_char_set(lang)
     return all(char not in char_set for char in name)
@@ -160,12 +160,7 @@ def is_invalid(column: str, name: str | None) -> bool:
         character set.
     """
     lang = column.split("_")[1].lower()
-    if (
-        not name
-        or not name.strip()
-        or not languages.get(alpha_2=lang)
-        or lang in exception_lang
-    ):
+    if not name or not name.strip() or not tag_is_valid(lang) or lang in exception_lang:
         return False
     char_set = get_char_set(lang)
     return any(char not in char_set + aux_set for char in name)
@@ -183,12 +178,7 @@ def get_illegal_chars(column: str, name: str | None) -> str:
         character set.
     """
     lang = column.split("_")[1].lower()
-    if (
-        not name
-        or not name.strip()
-        or not languages.get(alpha_2=lang)
-        or lang in exception_lang
-    ):
+    if not name or not name.strip() or not tag_is_valid(lang) or lang in exception_lang:
         return ""
     char_set = get_char_set(lang)
     return "".join({char for char in name if char not in char_set + aux_set})

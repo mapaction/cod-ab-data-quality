@@ -12,12 +12,13 @@ version = "0.1.0"
 
 [tool.poetry.dependencies]
 geopandas = "^1.0.1"
+hdx-python-country = "^3.8.2"
 httpx = { version = "^0.27.2", extras = ["http2"] }
 kaleido = "0.2.1"
+langcodes = "^3.4.1"
 pandas = { version = "^2.2.3", extras = ["excel", "performance"] }
 plotly = "^5.24.1"
 pyarrow = "^17.0.0"
-pycountry = "^24.6.1"
 pyicu = "^2.13.1"
 python = "^3.12"
 python-dotenv = "^1.0.1"

@@ -14,6 +14,7 @@ basicConfig(
 )
 getLogger("fontTools").setLevel(ERROR)
 getLogger("httpx").setLevel(WARNING)
+getLogger("hxl").setLevel(WARNING)
 getLogger("numexpr.utils").setLevel(WARNING)
 getLogger("pyogrio._io").setLevel(WARNING)
 

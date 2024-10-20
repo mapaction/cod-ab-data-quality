@@ -1,8 +1,8 @@
 from logging import getLogger
 from typing import Any
 
+from hdx.location.country import Country
 from pandas import DataFrame
-from pycountry import countries
 from tqdm import tqdm
 
 from src.config import metadata_columns, tables_dir
@@ -17,15 +17,21 @@ logger = getLogger(__name__)
 def get_metadata() -> list[dict[str, Any]]:
     """Gets metadata for all 249 ISO 3166 country codes.
 
-    Iterates through each location in PyCountry and adds metadata about those locations
-    from HDX and ITOS.
+    Iterates through each location in HDX countries and adds metadata about those
+    locations from HDX and ITOS.
 
     Returns:
-        A list of country config dicts from PyCountry with additional metadata from
+        A list of country config dicts from HDX countries with additional metadata from
         HDX and ITOS.
     """
     metadata = [
-        {"iso3": x.alpha_3, "iso2": x.alpha_2, "name": x.name} for x in countries
+        {
+            "iso3": iso3,
+            "iso2": Country.get_iso2_from_iso3(iso3),
+            "name": Country.get_country_name_from_iso3(iso3),
+        }
+        for iso3 in Country.countriesdata()["countries"]
+        if iso3 is not None
     ]
     iso3_list = get_iso3()
     if len(iso3_list):
