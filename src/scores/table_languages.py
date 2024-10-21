@@ -20,6 +20,9 @@ def main(checks: DataFrame) -> DataFrame:
         checks["language_count"].ge(1)
         & checks["language_invalid"].eq(0)
         & checks["language_1"].isin(romanized_languages)
-        & ~checks["language_count"].gt(checks["language_parent"])
+        & (
+            checks["language_parent"].isna()
+            | checks["language_count"].le(checks["language_parent"])
+        )
     )
     return scores
