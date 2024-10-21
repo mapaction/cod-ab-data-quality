@@ -26,7 +26,7 @@ def get_aux_codes(lang: str) -> list[str]:
 
 official_langs = ["ar", "en", "es", "fr", "ru", "zh"]
 
-exception_codes = {
+auxiliary_codes = {
     "ar-TUN": get_aux_codes("ar"),
     "en-CHN": get_aux_codes("en"),
     "en-PHL": get_aux_codes("en"),
@@ -44,8 +44,8 @@ exception_codes = {
 }
 exception_lang = ["zh"]
 
-numbers = [f"U+{ord(str(n)):04X}" for n in range(10)]  # U+0030-0039
-aux_codes = [
+number_codes = [f"U+{ord(str(n)):04X}" for n in range(10)]  # U+0030-0039
+punctuation_codes = [
     "U+0020",
     "U+0022",
     "U+0023",
@@ -57,10 +57,10 @@ aux_codes = [
     "U+002D",
     "U+002E",
     "U+002F",
-    *numbers,
+    *number_codes,
     "U+003A",
 ]
-aux_set = [chr(int(x[2:], 16)) for x in aux_codes]
+punctuation_set = [chr(int(x[2:], 16)) for x in punctuation_codes]
 
 
 def get_char_set(lang: str, iso3: str) -> list[str]:
@@ -80,7 +80,7 @@ def get_char_set(lang: str, iso3: str) -> list[str]:
             ULocaleDataExemplarSetType.ES_STANDARD,
         )
         for x in y
-    ] + [chr(int(x[2:], 16)) for x in exception_codes.get(f"{lang}-{iso3}", [])]
+    ] + [chr(int(x[2:], 16)) for x in auxiliary_codes.get(f"{lang}-{iso3}", [])]
 
 
 def get_invalid_chars(column: str, name: str | None, iso3: str) -> str:
@@ -99,7 +99,7 @@ def get_invalid_chars(column: str, name: str | None, iso3: str) -> str:
     if not name or not name.strip() or not tag_is_valid(lang) or lang in exception_lang:
         return ""
     char_set = get_char_set(lang, iso3)
-    return "".join({char for char in name if char not in char_set + aux_set})
+    return "".join({char for char in name if char not in char_set + punctuation_set})
 
 
 def is_invalid_adm0(column: str, name: str | None, iso3: str) -> bool:
@@ -186,7 +186,7 @@ def is_invalid(column: str, name: str | None, iso3: str) -> bool:
     if not name or not name.strip() or not tag_is_valid(lang) or lang in exception_lang:
         return False
     char_set = get_char_set(lang, iso3)
-    return any(char not in char_set + aux_set for char in name)
+    return any(char not in char_set + punctuation_set for char in name)
 
 
 def has_double_spaces(name: str | None) -> bool:
