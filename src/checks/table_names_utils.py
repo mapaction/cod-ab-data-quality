@@ -1,3 +1,4 @@
+from hdx.location.country import Country
 from icu import USET_ADD_CASE_MAPPINGS, LocaleData, ULocaleDataExemplarSetType
 from langcodes import tag_is_valid
 
@@ -20,6 +21,8 @@ def get_aux_codes(lang: str) -> list[str]:
         for x in y
     ]
 
+
+official_langs = ["ar", "en", "es", "fr", "ru", "zh"]
 
 exception_codes = {
     "en-CHN": get_aux_codes("en"),
@@ -98,6 +101,22 @@ def get_invalid_chars(column: str, name: str | None, iso3: str) -> str:
         return ""
     char_set = get_char_set(lang, iso3)
     return "".join({char for char in name if char not in char_set + aux_set})
+
+
+def is_invalid_adm0(column: str, name: str | None, iso3: str) -> bool:
+    """Checks if Admin 0 name is invalid.
+
+    Args:
+        column: Admin 0 column to check.
+        name: value of column.
+        iso3: ISO-3 country code.
+
+    Returns:
+        True if name doesn't match the official UN name from UNTERM.
+    """
+    lang = column.split("_")[1].lower()
+    info = Country.get_country_info_from_iso3(iso3)
+    return name != info[f"#country+alt+i_{lang}+name+v_unterm"]
 
 
 def is_upper(name: str | None) -> bool:

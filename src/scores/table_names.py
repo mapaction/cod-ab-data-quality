@@ -31,5 +31,6 @@ def main(checks: DataFrame) -> DataFrame:
         )
         & checks["name_no_valid"].eq(0)
         & checks["name_invalid"].eq(0)
+        & checks["name_invalid_adm0"].eq(0)
     )
     return scores

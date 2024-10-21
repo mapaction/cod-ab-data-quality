@@ -10,6 +10,7 @@ from .table_names_utils import (
     has_double_spaces,
     has_strippable_spaces,
     is_invalid,
+    is_invalid_adm0,
     is_lower,
     is_punctuation,
     is_upper,
@@ -34,6 +35,11 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
             for column in gdf.columns
             for level in range(admin_level + 1)
             if match(rf"^ADM{level}_[A-Z][A-Z]$", column)
+        ]
+        official_names = [
+            column
+            for column in name_columns
+            if match(r"^ADM0_(AR|EN|ES|FR|RU|ZH)$", column)
         ]
         names = gdf[name_columns]
         invalid_chars = "".join(
@@ -75,6 +81,14 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                     .map(lambda x, col=col: is_punctuation(col, x, iso3))
                     .sum()
                     for col in name_columns
+                ],
+            ),
+            "name_invalid_adm0": sum(
+                [
+                    names[col]
+                    .map(lambda x, col=col: is_invalid_adm0(col, x, iso3))
+                    .any()
+                    for col in official_names
                 ],
             ),
             "name_invalid": sum(
