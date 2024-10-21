@@ -63,6 +63,7 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
             "name_column_count": len(name_columns),
             "name_cell_count": max(names.size, 1),
             "name_empty": (names.isna() | names.map(is_empty)).sum().sum(),
+            "name_duplicated": names.duplicated().sum().sum(),
             "name_spaces_strip": sum(
                 [names[col].map(has_strippable_spaces).sum() for col in name_columns],
             ),

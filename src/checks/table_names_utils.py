@@ -2,7 +2,7 @@ from hdx.location.country import Country
 from icu import USET_ADD_CASE_MAPPINGS, LocaleData, ULocaleDataExemplarSetType
 from langcodes import tag_is_valid
 
-from src.config import unterm
+from src.config import m49, unterm
 
 
 def get_aux_codes(lang: str) -> list[str]:
@@ -116,6 +116,8 @@ def is_invalid_adm0(column: str, name: str | None, iso3: str) -> bool:
     lang = column.split("_")[1].lower()
     if iso3 in unterm:
         return name != unterm[iso3][f"{lang}_short"]
+    if iso3 in m49:
+        return name != m49[iso3][f"{lang}_short"]
     if lang == "en":
         return name != Country.get_country_name_from_iso3(iso3)
     return False

@@ -21,6 +21,7 @@ def main(checks: DataFrame) -> DataFrame:
             checks["language_count"] * (checks["level"] + 1),
         )
         & checks["name_empty"].eq(0)
+        & checks["name_duplicated"].eq(0)
         & checks["name_spaces_double"].eq(0)
         & checks["name_spaces_strip"].eq(0)
         & (checks["name_upper"] * checks["name_column_count"]).lt(

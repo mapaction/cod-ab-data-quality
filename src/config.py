@@ -83,3 +83,4 @@ metadata_columns = [
 ]
 
 unterm = {x["iso3"]: x for x in read_csv(cwd / "unterm.csv").to_dict("records")}
+m49 = {x["iso3"]: x for x in read_csv(cwd / "m49.csv").to_dict("records")}
