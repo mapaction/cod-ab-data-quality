@@ -27,15 +27,18 @@ def get_aux_codes(lang: str) -> list[str]:
 official_langs = ["ar", "en", "es", "fr", "ru", "zh"]
 
 exception_codes = {
+    "ar-TUN": get_aux_codes("ar"),
     "en-CHN": get_aux_codes("en"),
     "en-PHL": get_aux_codes("en"),
     "en-ZAF": get_aux_codes("en"),
     "es-PAN": get_aux_codes("es"),
+    "fa-IRN": get_aux_codes("fa"),
     "ht-HTI": get_aux_codes("ht"),
     "hy-ARM": get_aux_codes("hy"),
     "ky-KGZ": [*get_aux_codes("ky"), "U+04C9", "U+04CA"],
-    "my-MMR": [*get_aux_codes("my"), "U+104A"],
+    "my-MMR": [*get_aux_codes("my"), "U+104A", "U+200B", "U+200C"],
     "pt-BRA": get_aux_codes("pt"),
+    "si-LKA": get_aux_codes("si"),
     "tr-TUR": get_aux_codes("tr"),
     "vi-VNM": [*get_aux_codes("vi"), "U+0300", "U+0301"],
 }
@@ -56,12 +59,6 @@ aux_codes = [
     "U+002F",
     *numbers,
     "U+003A",
-    "U+0640",
-    "U+200B",
-    "U+200C",
-    "U+200D",
-    "U+200E",
-    "U+200F",
 ]
 aux_set = [chr(int(x[2:], 16)) for x in aux_codes]
 
