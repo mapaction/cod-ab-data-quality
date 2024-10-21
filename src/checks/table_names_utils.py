@@ -36,7 +36,7 @@ exception_codes = {
     "ht-HTI": get_aux_codes("ht"),
     "hy-ARM": get_aux_codes("hy"),
     "ky-KGZ": [*get_aux_codes("ky"), "U+04C9", "U+04CA"],
-    "my-MMR": [*get_aux_codes("my"), "U+104A", "U+200B", "U+200C"],
+    "my-MMR": [*get_aux_codes("my"), "U+104A", "U+200B"],
     "pt-BRA": get_aux_codes("pt"),
     "si-LKA": get_aux_codes("si"),
     "tr-TUR": get_aux_codes("tr"),
