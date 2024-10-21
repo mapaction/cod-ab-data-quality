@@ -65,7 +65,9 @@ images_dir.mkdir(parents=True, exist_ok=True)
 tables_dir = cwd / "../data/tables"
 tables_dir.mkdir(parents=True, exist_ok=True)
 
+official_languages = ["ar", "en", "es", "fr", "ru", "zh"]
 romanized_languages = ["en", "fr", "es", "pt"]
+
 metadata_columns = [
     "iso3",
     "iso2",
