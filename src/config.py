@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
+from pandas import read_csv
 
 load_dotenv(override=True)
 
@@ -79,3 +80,5 @@ metadata_columns = [
     "hdx_source_2",
     "hdx_license",
 ]
+
+unterm = {x["iso3"]: x for x in read_csv(cwd / "unterm.csv").to_dict("records")}

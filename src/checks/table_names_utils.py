@@ -2,6 +2,8 @@ from hdx.location.country import Country
 from icu import USET_ADD_CASE_MAPPINGS, LocaleData, ULocaleDataExemplarSetType
 from langcodes import tag_is_valid
 
+from src.config import unterm
+
 
 def get_aux_codes(lang: str) -> list[str]:
     """Gets auxiliary characters for a language.
@@ -115,8 +117,11 @@ def is_invalid_adm0(column: str, name: str | None, iso3: str) -> bool:
         True if name doesn't match the official UN name from UNTERM.
     """
     lang = column.split("_")[1].lower()
-    info = Country.get_country_info_from_iso3(iso3)
-    return name != info[f"#country+alt+i_{lang}+name+v_unterm"]
+    if iso3 in unterm:
+        return name != unterm[iso3][f"{lang}_short"]
+    if lang == "en":
+        return name != Country.get_country_name_from_iso3(iso3)
+    return False
 
 
 def is_upper(name: str | None) -> bool:
