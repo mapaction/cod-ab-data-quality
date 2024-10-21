@@ -1,11 +1,12 @@
 from logging import getLogger
 from typing import Any
 
+from hdx.location.country import Country
 from pandas import DataFrame
 from tqdm import tqdm
 
-from src.config import TIMEOUT, metadata_columns, tables_dir
-from src.utils import client_get, get_iso3
+from src.config import metadata_columns, tables_dir
+from src.utils import get_iso3
 
 from .getters import get_hdx_metadata, get_itos_metadata
 from .join import join_hdx_metadata, join_itos_metadata
@@ -16,16 +17,22 @@ logger = getLogger(__name__)
 def get_metadata() -> list[dict[str, Any]]:
     """Gets metadata for all 249 ISO 3166 country codes.
 
-    Iterates through each location in the OCHA Country and Territory name list and adds
-    metadata about those locations from HDX and ITOS.
+    Iterates through each location in HDX countries and adds metadata about those
+    locations from HDX and ITOS.
 
     Returns:
-        A list of country config dicts from OCHA with additional metadata from
+        A list of country config dicts from HDX countries with additional metadata from
         HDX and ITOS.
     """
-    url = "https://vocabulary.unocha.org/json/beta-v4/countries.json"
-    metadata: list[dict] = client_get(url, TIMEOUT).json()["data"]
-    metadata = [x for x in metadata if x["iso3"] is not None]
+    metadata = [
+        {
+            "iso3": iso3,
+            "iso2": Country.get_iso2_from_iso3(iso3),
+            "name": Country.get_country_name_from_iso3(iso3),
+        }
+        for iso3 in Country.countriesdata()["countries"]
+        if iso3 is not None
+    ]
     iso3_list = get_iso3()
     if len(iso3_list):
         metadata = [x for x in metadata if x["iso3"] in iso3_list]
@@ -33,7 +40,6 @@ def get_metadata() -> list[dict[str, Any]]:
     pbar = tqdm(metadata)
     for row in pbar:
         pbar.set_postfix_str(row["iso3"])
-        row["name"] = row["label"]["default"]
         hdx = get_hdx_metadata(row["iso3"])
         if hdx is not None:
             row.update(join_hdx_metadata(hdx))
