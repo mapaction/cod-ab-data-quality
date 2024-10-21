@@ -1,4 +1,3 @@
-from math import inf
 from re import compile
 
 from geopandas import GeoDataFrame
@@ -46,23 +45,13 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
         List of results to output as a CSV.
     """
     check_results = []
-    language_min = inf
-    language_max = -inf
-    for admin_level, gdf in enumerate(gdfs):
-        lang_count = len(get_langs(gdf, admin_level))
-        if lang_count:
-            language_min = min(language_min, lang_count)
-            language_max = max(language_max, lang_count)
-    if language_min == inf:
-        language_min = None
-        language_max = None
+    language_parent = None
     for admin_level, gdf in enumerate(gdfs):
         row = {
             "iso3": iso3,
             "level": admin_level,
-            "language_min": language_min,
-            "language_max": language_max,
             "language_count": 0,
+            "language_parent": language_parent,
             "language_invalid": 0,
         }
         langs = get_langs(gdf, admin_level)
@@ -71,5 +60,6 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
             row[f"language_{index+1}"] = lang
             if not tag_is_valid(lang):
                 row["language_invalid"] += 1
+        language_parent = row["language_count"]
         check_results.append(row)
     return check_results

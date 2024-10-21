@@ -1,5 +1,7 @@
 from pandas import DataFrame
 
+from src.config import romanized_languages
+
 
 def main(checks: DataFrame) -> DataFrame:
     """Function for scoring languages used within dataset.
@@ -14,7 +16,10 @@ def main(checks: DataFrame) -> DataFrame:
         Checks DataFrame with additional columns for scoring.
     """
     scores = checks[["iso3", "level"]].copy()
-    scores["languages"] = checks["language_count"].gt(0) & checks[
-        "language_invalid"
-    ].eq(0)
+    scores["languages"] = (
+        checks["language_count"].ge(1)
+        & checks["language_invalid"].eq(0)
+        & checks["language_1"].isin(romanized_languages)
+        & ~checks["language_count"].gt(checks["language_parent"])
+    )
     return scores
