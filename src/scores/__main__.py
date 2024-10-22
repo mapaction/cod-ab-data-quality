@@ -12,6 +12,7 @@ from . import (
     table_dates,
     table_languages,
     table_names,
+    table_other,
     table_pcodes,
 )
 
@@ -42,6 +43,7 @@ def main() -> None:
         table_languages,
         table_dates,
         table_areas,
+        table_other,
     )
 
     metadata = read_csv(tables_dir / "metadata.csv")
