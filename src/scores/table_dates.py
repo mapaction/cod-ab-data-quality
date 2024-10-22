@@ -17,7 +17,10 @@ def main(checks: DataFrame) -> DataFrame:
     """
     scores = checks[["iso3", "level"]].copy()
     scores["date"] = checks["date_count"].eq(1)
-    scores["valid_on"] = checks["update_count"].eq(1) & checks["update_1"].gt(
-        Timestamp.now() - relativedelta(years=1),
+    scores["valid_on"] = (
+        checks["update_count"].eq(1)
+        & checks["update_1"].gt(Timestamp.now() - relativedelta(years=1))
+        & checks["valid_to_exists"].eq(1)
+        & checks["valid_to_empty"].eq(1)
     )
     return scores

@@ -28,7 +28,14 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
     """
     check_results = []
     for admin_level, gdf in enumerate(gdfs):
-        row = {"iso3": iso3, "level": admin_level, "date_count": 0, "update_count": 0}
+        row = {
+            "iso3": iso3,
+            "level": admin_level,
+            "valid_to_exists": 0,
+            "valid_to_empty": 0,
+            "date_count": 0,
+            "update_count": 0,
+        }
         try:
             gdf_date = gdf[~gdf["date"].isna()]["date"].dt.date.drop_duplicates()
             for index, value in enumerate(gdf_date):
@@ -42,5 +49,9 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                 row[f"update_{index+1}"] = value
         except KeyError:
             pass
+        if "validTo" in gdf.columns:
+            row["valid_to_exists"] = 1
+            if gdf["validTo"].isna().all():
+                row["valid_to_empty"] = 1
         check_results.append(row)
     return check_results

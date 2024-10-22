@@ -18,6 +18,7 @@ from . import (
     geometry_within_parent,
     languages,
     table_names,
+    table_other,
     table_pcodes,
 )
 
@@ -97,6 +98,7 @@ def main() -> None:
         (table_names, []),
         (dates, []),
         (languages, []),
+        (table_other, []),
     ]
 
     checks = filter_checks(checks)
