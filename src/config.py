@@ -66,7 +66,7 @@ tables_dir = cwd / "../data/tables"
 tables_dir.mkdir(parents=True, exist_ok=True)
 
 official_languages = ["ar", "en", "es", "fr", "ru", "zh"]
-romanized_languages = ["en", "fr", "es", "pt"]
+romanized_languages = ["en", "es", "fr", "hu", "id", "nl", "pl", "pt", "ro", "sk"]
 
 metadata_columns = [
     "iso3",
