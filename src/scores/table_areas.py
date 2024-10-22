@@ -18,6 +18,6 @@ def main(checks: DataFrame) -> DataFrame:
         checks[["geom_area_km", "geom_area_km_attr"]]
         .pct_change(axis=1, fill_method=None)["geom_area_km_attr"]
         .abs()
-        .lt(0.01)
+        .lt(0.00001)
     )
     return scores
