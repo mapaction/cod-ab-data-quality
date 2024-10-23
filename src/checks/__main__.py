@@ -7,17 +7,19 @@ from pandas import DataFrame
 from pyogrio.errors import DataSourceError
 from tqdm import tqdm
 
-from src.config import boundaries_dir, tables_dir
+from src.config import MULTIPROCESSING, boundaries_dir, tables_dir
 from src.utils import get_checks_filter, get_metadata
 
 from . import (
     dates,
-    geometry,
-    geometry_overlaps_parent,
+    geometry_gaps,
     geometry_overlaps_self,
+    geometry_valid,
+    geometry_within_parent,
     languages,
-    table_data_completeness,
-    table_data_formatting_has_data,
+    table_names,
+    table_other,
+    table_pcodes,
 )
 
 logger = getLogger(__name__)
@@ -40,6 +42,28 @@ def filter_checks(checks: list[Any]) -> list[Any]:
             x for x in checks if x[0].__name__.split(".")[-1] not in checks_exclude
         ]
     return checks
+
+
+def create_output(checks: list) -> None:
+    """Create CSV from registered checks.
+
+    Args:
+        checks: Registered checks.
+    """
+    output = None
+    for _, results in checks:
+        if MULTIPROCESSING:
+            rows = [row for result in results for row in result.get()]
+        else:
+            rows = [row for result in results for row in result]
+        partial = DataFrame(rows).convert_dtypes()
+        if output is None:
+            output = partial
+        else:
+            output = output.merge(partial, on=["iso3", "level"], how="outer")
+    if output is not None:
+        dest = tables_dir / "checks.csv"
+        output.to_csv(dest, encoding="utf-8-sig", index=False)
 
 
 def main() -> None:
@@ -66,13 +90,15 @@ def main() -> None:
 
     # NOTE: Register checks here.
     checks = [
-        (geometry, []),
+        (geometry_valid, []),
+        (geometry_gaps, []),
         (geometry_overlaps_self, []),
-        (geometry_overlaps_parent, []),
-        (table_data_completeness, []),
+        (geometry_within_parent, []),
+        (table_pcodes, []),
+        (table_names, []),
         (dates, []),
         (languages, []),
-        (table_data_formatting_has_data, []),
+        (table_other, []),
     ]
 
     checks = filter_checks(checks)
@@ -92,23 +118,18 @@ def main() -> None:
             except DataSourceError:
                 gdf = GeoDataFrame()
             gdfs.append(gdf)
-        with Pool() as pool:
-            for function, results in checks:
-                result = pool.apply_async(function.main, args=[iso3, gdfs])
-                results.append(result)
-            pool.close()
-            pool.join()
-    output = None
-    for _, results in checks:
-        rows = [row for result in results for row in result.get()]
-        partial = DataFrame(rows).convert_dtypes()
-        if output is None:
-            output = partial
+        if MULTIPROCESSING:
+            with Pool() as pool:
+                for function, results in checks:
+                    result = pool.apply_async(function.main, args=[iso3, gdfs])
+                    results.append(result)
+                pool.close()
+                pool.join()
         else:
-            output = output.merge(partial, on=["iso3", "level"], how="outer")
-    if output is not None:
-        dest = tables_dir / "checks.csv"
-        output.to_csv(dest, encoding="utf-8-sig", index=False)
+            for function, results in checks:
+                result = function.main(iso3, gdfs)
+                results.append(result)
+    create_output(checks)
     logger.info("Finished")
 
 

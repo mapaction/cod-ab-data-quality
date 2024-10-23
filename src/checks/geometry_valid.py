@@ -15,20 +15,19 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
     """Check properties associated with geometry.
 
     The first section of checks look at validity criteria:
-    - geom_is_polygon: Checks if all geometries are Polygon or MultiPolygons.
-    - geom_is_xy: Checks that a geometry doesn't contain Z dimension (is 3D).
-    - geom_is_valid: Checks that a geometry is valid.
-    - geom_invalid_reason: Explains why a polygon is invalid.
+    - geom_count: Count of geometries.
+    - geom_empty: Count of empty geometries.
+    - geom_not_polygon: Count of geometries which are not a Polygon or MultiPolygons.
+    - geom_has_z: Count of geometries with a Z dimension (are 3D).
+    - geom_is_valid: Count of invalid geometries.
+    - geom_invalid_reason: Explains why geometries are invalid.
 
     The next section looks at projection and bounds:
     - geom_proj: Gives the EPSG code of the dataset's projection.
     - geom_{min|max}_{x|y}: Gives the bounding box in decimal degrees.
 
     Finally, areas are calculated:
-    - geom_area_km: The sum of individual geometries. Counts overlaped areas twice.
-    - geom_area_km_dissolved: The sum of dissolved geometries. This resolves overlaps.
-    - geom_area_km_overlap: The area of overlapping polygons. Values <= 1e-6 may be
-        false positives. Please rely on `geom_overlaps` for more accurate metrics.
+    - geom_area_km: The sum area of individual geometries.
 
     Args:
         iso3: ISO3 code of the current location being checked.
@@ -47,10 +46,7 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                 for x in gdf.geometry.to_crs(EPSG_WGS84).total_bounds
             ]
             epsg_ease = get_epsg_ease(min_y, max_y)
-            valid = gdf.copy()
-            valid.geometry = valid.geometry.make_valid()
-            area = int(valid.geometry.to_crs(epsg_ease).area.sum())
-            area_dissolved = int(valid.dissolve().to_crs(epsg_ease).area.sum())
+            area = int(gdf.geometry.to_crs(epsg_ease).area.sum())
             invalid_reason = ", ".join(
                 {
                     reason.split("[")[0]
@@ -59,10 +55,15 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                 },
             )
             row |= {
-                "geom_not_empty": ~(gdf.geometry.is_empty | gdf.geometry.isna()).any(),
-                "geom_is_polygon": gdf.geometry.geom_type.str.contains(POLYGON).all(),
-                "geom_is_xy": ~gdf.geometry.has_z.any(),
-                "geom_is_valid": gdf.geometry.is_valid.all(),
+                "geom_count": len(gdf.index),
+                "geom_empty": len(
+                    gdf[gdf.geometry.is_empty | gdf.geometry.isna()].index,
+                ),
+                "geom_not_polygon": len(
+                    gdf[~gdf.geometry.geom_type.str.contains(POLYGON)].index,
+                ),
+                "geom_has_z": len(gdf[gdf.geometry.has_z].index),
+                "geom_invalid": len(gdf[~gdf.geometry.is_valid].index),
                 "geom_invalid_reason": invalid_reason,
                 "geom_proj": gdf.geometry.crs.to_epsg(),
                 "geom_min_x": min_x,
@@ -70,8 +71,8 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                 "geom_max_x": max_x,
                 "geom_max_y": max_y,
                 "geom_area_km": area / METERS_PER_KM,
-                "geom_area_km_dissolved": area_dissolved / METERS_PER_KM,
-                "geom_area_km_overlap": (area - area_dissolved) / METERS_PER_KM,
             }
+            if "AREA_SQKM" in gdf.columns:
+                row["geom_area_km_attr"] = gdf["AREA_SQKM"].sum()
         check_results.append(row)
     return check_results

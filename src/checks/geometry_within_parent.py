@@ -4,10 +4,10 @@ from src.config import CheckReturnList
 
 
 def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
-    """Check for the number of overlaping geometries between self and parent.
+    """Check for the number of geometries within a parent layer.
 
-    If a dataset is perfectly hierarchally nested, each geometry will only belong to a
-    single parent geometry.
+    If a dataset is perfectly hierarchally nested, each geometry will fall within a
+    parent geometry.
 
     Args:
         iso3: ISO3 code of the current location being checked.
@@ -24,19 +24,29 @@ def main(iso3: str, gdfs: list[GeoDataFrame]) -> CheckReturnList:
                 row = {
                     "iso3": iso3,
                     "level": admin_level,
-                    "geom_overlaps_parent": 0,
+                    "geom_not_within_parent": 0,
                 }
                 check_results.append(row)
             else:
                 parent = gdfs[admin_level - 1]
                 if parent.active_geometry_name:
-                    parents = len(
-                        gdf.sjoin(parent, how="left", predicate="overlaps").index,
-                    )
+                    within = gdf.sjoin(parent, predicate="within")
                     row = {
                         "iso3": iso3,
                         "level": admin_level,
-                        "geom_overlaps_parent": parents - len(gdf.index),
+                        "geom_not_within_parent": len(gdf.index) - len(within.index),
                     }
+                    pcode_left = f"ADM{admin_level-1}_PCODE_left"
+                    pcode_right = f"ADM{admin_level-1}_PCODE_right"
+                    if all(x in within.columns for x in [pcode_left, pcode_right]):
+                        pcode = within[
+                            within[f"ADM{admin_level-1}_PCODE_left"].eq(
+                                within[f"ADM{admin_level-1}_PCODE_right"],
+                            )
+                        ]
+                        row |= {
+                            "geom_not_within_pcode": len(within.index)
+                            - len(pcode.index),
+                        }
                     check_results.append(row)
     return check_results
