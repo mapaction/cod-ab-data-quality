@@ -22,9 +22,7 @@ def main(checks: DataFrame) -> DataFrame:
         )
         & checks["geom_overlaps_self"].eq(0)
         & checks["geom_not_within_parent"].eq(0)
-        & (
-            checks["geom_not_within_pcode"].isna()
-            | checks["geom_not_within_pcode"].eq(0)
-        )
+        & checks["geom_within_name_mismatch"].eq(0)
+        & checks["geom_within_pcode_mismatch"].eq(0)
     )
     return scores
